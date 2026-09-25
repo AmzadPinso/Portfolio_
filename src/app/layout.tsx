@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, Newsreader, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -9,24 +9,25 @@ const inter = Inter({
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600"],
 });
 
 const siteUrl = "https://amzadpinso.dev";
-const title = "Amzad Pinso — CSE Student | AI Researcher | Teaching Assistant";
+const title = "Amzad Pinso — CSE Student · AI Researcher · Teaching Assistant";
 const description =
-  "Personal portfolio of Amzad Pinso, a Computer Science and Engineering student, undergraduate teaching assistant, and AI research enthusiast from Chattogram, Bangladesh. Exploring Explainable AI, ensemble learning, and healthcare analytics.";
+  "Personal portfolio of Amzad Pinso, a Computer Science & Engineering student at IIUC, undergraduate teaching assistant, and AI research enthusiast. Exploring explainable AI, ensemble learning, healthcare analytics, and software engineering through research, teaching, and technical projects.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -39,12 +40,16 @@ export const metadata: Metadata = {
     "Amzad Pinso",
     "Computer Science",
     "Engineering",
+    "CSE Student",
     "AI Researcher",
     "Teaching Assistant",
+    "Teaching",
     "Explainable AI",
     "Ensemble Learning",
     "Healthcare Analytics",
     "Machine Learning",
+    "Data Science",
+    "Software Engineering",
     "IIUC",
     "Bangladesh",
     "Portfolio",
@@ -60,7 +65,7 @@ export const metadata: Metadata = {
     title,
     description,
     url: siteUrl,
-    siteName: "Amzad Pinso Portfolio",
+    siteName: "Amzad Pinso — Portfolio",
     locale: "en_US",
     type: "website",
     images: [
@@ -95,11 +100,20 @@ export const metadata: Metadata = {
   category: "portfolio",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#0D0F12",
+  width: "device-width",
+  initialScale: 1,
+};
+
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Amzad Pinso",
-  jobTitle: "Computer Science & Engineering Student, Teaching Assistant, AI Researcher",
+  jobTitle:
+    "Computer Science & Engineering Student, Teaching Assistant, AI Researcher",
+  description:
+    "CSE undergraduate at IIUC and undergraduate teaching assistant, exploring explainable AI, ensemble learning, and healthcare analytics through research and teaching.",
   email: "mailto:contact.amzadpinso@gmail.com",
   telephone: "+8801537290195",
   url: siteUrl,
@@ -118,7 +132,10 @@ const structuredData = {
     "Ensemble Learning",
     "Healthcare Analytics",
     "Machine Learning",
+    "Predictive Modeling",
     "Data Science",
+    "Software Engineering",
+    "Teaching",
   ],
   sameAs: ["https://www.linkedin.com/in/amzad-pinso"],
 };
@@ -137,7 +154,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${newsreader.variable} ${plexMono.variable} antialiased bg-background text-foreground`}
       >
         {children}
         <Toaster />

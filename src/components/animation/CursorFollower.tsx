@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
+import { SPRING_CURSOR } from "./Reveal";
 
 /**
  * Subscribe to the (pointer: coarse) media query so we can disable
@@ -38,8 +39,8 @@ export function CursorFollower() {
   const ringRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const ringX = useSpring(x, { stiffness: 220, damping: 28, mass: 0.5 });
-  const ringY = useSpring(y, { stiffness: 220, damping: 28, mass: 0.5 });
+  const ringX = useSpring(x, SPRING_CURSOR);
+  const ringY = useSpring(y, SPRING_CURSOR);
 
   useEffect(() => {
     if (!enabled) return;
@@ -88,9 +89,9 @@ export function CursorFollower() {
         className="cursor-ring"
         style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
         animate={{
-          width: hovering ? 64 : 36,
-          height: hovering ? 64 : 36,
-          opacity: hidden ? 0 : hovering ? 0.85 : 0.45,
+          width: hovering ? 52 : 32,
+          height: hovering ? 52 : 32,
+          opacity: hidden ? 0 : hovering ? 0.7 : 0.45,
         }}
         transition={{ duration: 0.25 }}
       />

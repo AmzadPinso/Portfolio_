@@ -7,8 +7,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
-  --font-display: var(--font-playfair);
-  --font-mono: var(--font-mono);
+  --font-display: var(--font-newsreader);
+  --font-mono: var(--font-plex-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -44,74 +44,89 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ──────────────────────────────────────────────────────────────
+   DARK ACADEMIC COLOR SYSTEM
+   Deep charcoal background + slightly elevated surfaces + soft white text
+   + ONE restrained muted-blue accent. Cool hue family for harmony.
+   ────────────────────────────────────────────────────────────── */
 :root {
   --radius: 0.25rem;
-  /* Editorial palette: warm off-white paper, near-black ink, restrained burnt sienna accent */
-  --background: #F4F1EA;
-  --foreground: #0A0A0A;
-  --card: #FDFCF8;
-  --card-foreground: #0A0A0A;
-  --popover: #FDFCF8;
-  --popover-foreground: #0A0A0A;
-  --primary: #0A0A0A;
-  --primary-foreground: #F4F1EA;
-  --secondary: #EAE6DC;
-  --secondary-foreground: #0A0A0A;
-  --muted: #EAE6DC;
-  --muted-foreground: #6B6B6B;
-  --accent: #B8451F;
-  --accent-foreground: #FDFCF8;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: rgba(10, 10, 10, 0.1);
-  --input: rgba(10, 10, 10, 0.1);
-  --ring: #B8451F;
-  --chart-1: #B8451F;
-  --chart-2: #0A0A0A;
-  --chart-3: #6B6B6B;
-  --chart-4: #EAE6DC;
-  --chart-5: #F4F1EA;
-  --sidebar: #F4F1EA;
-  --sidebar-foreground: #0A0A0A;
-  --sidebar-primary: #0A0A0A;
-  --sidebar-primary-foreground: #F4F1EA;
-  --sidebar-accent: #EAE6DC;
-  --sidebar-accent-foreground: #0A0A0A;
-  --sidebar-border: rgba(10, 10, 10, 0.1);
-  --sidebar-ring: #B8451F;
+
+  /* Layered dark surfaces (cool undertone, ~220° hue) */
+  --background: #0D0F12;          /* deep charcoal — NOT pure black */
+  --secondary: #131619;            /* slightly lifted band surface */
+  --card: #15181D;                 /* elevated surface for cards */
+  --popover: #15181D;
+  --popover-foreground: #F2F3F5;
+  --muted: #131619;
+  --muted-foreground: #A7ADB7;     /* cool muted gray — passes AAA */
+
+  /* Text */
+  --foreground: #F2F3F5;           /* soft warm off-white */
+  --card-foreground: #F2F3F5;
+  --secondary-foreground: #F2F3F5;
+
+  /* Primary = inverted (for filled CTAs) */
+  --primary: #F2F3F5;
+  --primary-foreground: #0D0F12;
+
+  /* Accent — muted electric blue, the single restrained accent */
+  --accent: #6E8AF5;
+  --accent-foreground: #0D0F12;
+
+  /* Subtle borders — white at low opacity */
+  --border: rgba(242, 243, 245, 0.10);
+  --input: rgba(242, 243, 245, 0.12);
+  --ring: #6E8AF5;
+
+  /* Chart palette (consistent with accent + neutrals) */
+  --chart-1: #6E8AF5;
+  --chart-2: #F2F3F5;
+  --chart-3: #A7ADB7;
+  --chart-4: #15181D;
+  --chart-5: #0D0F12;
+
+  /* Sidebar tokens (kept for any future sidebar use) */
+  --sidebar: #0D0F12;
+  --sidebar-foreground: #F2F3F5;
+  --sidebar-primary: #F2F3F5;
+  --sidebar-primary-foreground: #0D0F12;
+  --sidebar-accent: #15181D;
+  --sidebar-accent-foreground: #F2F3F5;
+  --sidebar-border: rgba(242, 243, 245, 0.10);
+  --sidebar-ring: #6E8AF5;
+
+  /* ── NEW: Light form / geometric shape tokens ── */
+  --shape-outline: rgba(242, 243, 245, 0.06);    /* thin outlined shapes */
+  --shape-outline-strong: rgba(242, 243, 245, 0.10);
+  --shape-glow: rgba(110, 138, 245, 0.10);        /* soft accent glow */
+  --grid-line: rgba(242, 243, 245, 0.04);         /* very faint grid */
+
+  /* Destructive (kept for any future form errors) */
+  --destructive: #E0556E;
 }
 
 .dark {
-  --background: #0A0A0A;
-  --foreground: #F4F1EA;
-  --card: #141414;
-  --card-foreground: #F4F1EA;
-  --popover: #141414;
-  --popover-foreground: #F4F1EA;
-  --primary: #F4F1EA;
-  --primary-foreground: #0A0A0A;
-  --secondary: #1C1C1C;
-  --secondary-foreground: #F4F1EA;
-  --muted: #1C1C1C;
-  --muted-foreground: #9B9B9B;
-  --accent: #D97757;
-  --accent-foreground: #0A0A0A;
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: rgba(244, 241, 234, 0.12);
-  --input: rgba(244, 241, 234, 0.12);
-  --ring: #D97757;
-  --chart-1: #D97757;
-  --chart-2: #F4F1EA;
-  --chart-3: #9B9B9B;
-  --chart-4: #1C1C1C;
-  --chart-5: #0A0A0A;
-  --sidebar: #0A0A0A;
-  --sidebar-foreground: #F4F1EA;
-  --sidebar-primary: #F4F1EA;
-  --sidebar-primary-foreground: #0A0A0A;
-  --sidebar-accent: #1C1C1C;
-  --sidebar-accent-foreground: #F4F1EA;
-  --sidebar-border: rgba(244, 241, 234, 0.12);
-  --sidebar-ring: #D97757;
+  /* Dark is the default identity — keep .dark block as a no-op mirror so
+     any future theme toggle won't break the design. */
+  --background: #0D0F12;
+  --foreground: #F2F3F5;
+  --card: #15181D;
+  --card-foreground: #F2F3F5;
+  --popover: #15181D;
+  --popover-foreground: #F2F3F5;
+  --primary: #F2F3F5;
+  --primary-foreground: #0D0F12;
+  --secondary: #131619;
+  --secondary-foreground: #F2F3F5;
+  --muted: #131619;
+  --muted-foreground: #A7ADB7;
+  --accent: #6E8AF5;
+  --accent-foreground: #0D0F12;
+  --destructive: #E0556E;
+  --border: rgba(242, 243, 245, 0.10);
+  --input: rgba(242, 243, 245, 0.12);
+  --ring: #6E8AF5;
 }
 
 @layer base {
@@ -130,6 +145,12 @@
     font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "ss01", "cv01", "cv03";
     overflow-x: hidden;
+    background-color: var(--background);
+    /* Layered atmospheric depth: subtle radial accent glow at top, faint noise */
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(110, 138, 245, 0.08), transparent 60%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-attachment: fixed, fixed;
   }
 
   ::selection {
@@ -137,7 +158,7 @@
     color: var(--accent-foreground);
   }
 
-  /* Refined scrollbar */
+  /* Refined scrollbar — visible on dark */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -146,56 +167,78 @@
     background: var(--background);
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(10, 10, 10, 0.18);
+    background: rgba(242, 243, 245, 0.16);
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: var(--accent);
   }
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(242, 243, 245, 0.20) var(--background);
+  }
 
-  .dark ::-webkit-scrollbar-thumb {
-    background: rgba(244, 241, 234, 0.18);
+  /* Visible focus states for keyboard navigation */
+  *:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  *:focus:not(:focus-visible) {
+    outline: none;
   }
 }
 
 @layer utilities {
-  /* Editorial display typography */
+  /* ── Typography ────────────────────────────────────────────── */
+
   .font-display {
-    font-family: var(--font-display), Georgia, "Times New Roman", serif;
+    font-family: var(--font-newsreader), "Source Serif 4", Georgia, "Times New Roman", serif;
     font-feature-settings: "lnum", "ss01";
+    font-optical-sizing: auto;
   }
 
   .font-mono {
-    font-family: var(--font-mono), ui-monospace, monospace;
+    font-family: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+    font-feature-settings: "zero", "ss01";
   }
 
-  /* Fluid typography using clamp */
+  /* Fluid display typography — Newsreader needs slightly looser letter-spacing
+     on dark to avoid the "spread" effect of dark backgrounds. */
   .text-display {
-    font-size: clamp(3.5rem, 11vw, 11rem);
+    font-size: clamp(3rem, 11vw, 10.5rem);
     line-height: 0.92;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    text-wrap: balance;
   }
   .text-display-md {
-    font-size: clamp(2.75rem, 7vw, 6.5rem);
-    line-height: 0.95;
-    letter-spacing: -0.035em;
+    font-size: clamp(2.5rem, 7vw, 6rem);
+    line-height: 0.96;
+    letter-spacing: -0.018em;
+    font-weight: 600;
+    text-wrap: balance;
   }
   .text-headline {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    line-height: 1.02;
-    letter-spacing: -0.025em;
+    font-size: clamp(1.75rem, 4vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.012em;
+    font-weight: 500;
+    text-wrap: balance;
   }
   .text-eyebrow {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     font-weight: 500;
   }
   .text-section-number {
-    font-size: clamp(0.75rem, 1vw, 0.875rem);
-    letter-spacing: 0.18em;
+    font-size: clamp(0.6875rem, 0.9vw, 0.75rem);
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     font-weight: 500;
+    font-variant-numeric: tabular-nums;
   }
 
   /* Container with editorial spacing */
@@ -212,22 +255,77 @@
     border-color: var(--border);
   }
 
-  /* Noise overlay for premium feel */
-  .noise-overlay {
-    position: relative;
-  }
-  .noise-overlay::after {
-    content: "";
+  /* ── Light form / geometric shape utilities ──────────────── */
+
+  /* Subtle drifting accent glow — adds depth to dark backgrounds.
+     Use sparingly: one per major section, sits behind content. */
+  .bg-glow {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    opacity: 0.35;
-    mix-blend-mode: multiply;
-    z-index: 1;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .bg-glow::before {
+    content: "";
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(
+      circle at center,
+      color-mix(in oklab, var(--accent) 12%, transparent) 0%,
+      transparent 60%
+    );
+    filter: blur(40px);
+    opacity: 0.55;
+    animation: glow-drift 22s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+  }
+  @keyframes glow-drift {
+    0% {
+      transform: translate(8vw, 6vh) scale(1);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translate(22vw, 14vh) scale(1.08);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translate(36vw, 8vh) scale(1);
+      opacity: 0.45;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-glow::before {
+      animation: none;
+      opacity: 0.5;
+      transform: translate(20vw, 10vh);
+    }
   }
 
-  /* Custom cursor (desktop only) */
+  /* Faint grid background — very low opacity vertical/horizontal lines */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .bg-grid-fade {
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 30%, transparent 75%);
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 30%, transparent 75%);
+  }
+
+  /* Large outlined circle behind content (decorative, static) */
+  .shape-circle-outline {
+    position: absolute;
+    border-radius: 9999px;
+    border: 1px solid var(--shape-outline);
+    pointer-events: none;
+  }
+
+  /* ── Custom cursor (desktop only) ─────────────────────────── */
   @media (pointer: fine) {
     body {
       cursor: none;
@@ -237,18 +335,17 @@
     }
   }
 
-  /* Cursor element styling */
   .cursor-dot {
     position: fixed;
     top: 0;
     left: 0;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 9999px;
     background: var(--foreground);
     pointer-events: none;
     z-index: 9999;
-    transition: width 0.18s ease, height 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+    transition: opacity 0.18s ease, scale 0.18s ease;
     will-change: transform;
     mix-blend-mode: difference;
   }
@@ -256,13 +353,13 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 9999px;
     border: 1px solid var(--foreground);
     pointer-events: none;
     z-index: 9999;
-    transition: width 0.25s ease, height 0.25s ease, opacity 0.25s ease;
+    transition: opacity 0.25s ease, scale 0.25s ease;
     will-change: transform;
     mix-blend-mode: difference;
   }
@@ -271,10 +368,12 @@
     .cursor-dot, .cursor-ring {
       display: none !important;
     }
-    body { cursor: auto; }
+    body {
+      cursor: auto;
+    }
   }
 
-  /* Link underline reveal */
+  /* ── Link underline reveal ────────────────────────────────── */
   .link-underline {
     position: relative;
     display: inline-block;
@@ -296,7 +395,7 @@
     transform: scaleX(1);
   }
 
-  /* Marquee */
+  /* ── Marquee (kept for any future use) ────────────────────── */
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
@@ -305,13 +404,16 @@
     animation: marquee 28s linear infinite;
   }
 
-  /* Reduce motion */
+  /* ── Reduced motion (global catch-all) ───────────────────── */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
       scroll-behavior: auto !important;
+    }
+    .animate-marquee, .bg-glow::before {
+      animation-play-state: paused !important;
     }
   }
 

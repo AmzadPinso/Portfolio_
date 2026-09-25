@@ -666,3 +666,276 @@ bun run start       # starts production server
 | 2026-09-25 | `feat: add SEO metadata, favicon, and placeholder assets` | me.jpg, cv.pdf, favicon.svg + full SEO |
 | 2026-09-25 | `fix: configure allowed dev origins and verify responsive behavior` | next.config allowedDevOrigins, mobile menu verified |
 | 2026-09-25 | `perf: polish placeholder UX and finalize QA` | Cleaner placeholder copy, final lint pass |
+
+---
+
+## Major Redesign — Dark Academic / Research Identity
+
+### Why
+The previous visual system was cream-heavy (`#F4F1EA` background, `#0A0A0A` ink, `#B8451F` burnt-sienna accent). While editorial, the warm cream palette and the high-contrast Playfair Display display font unintentionally read as a creative-agency / freelancer portfolio rather than the personal academic identity of a CSE student, undergraduate teaching assistant, and AI researcher. The hero's CTA hierarchy (`VIEW PROJECTS →` first) and the projects section's `ENQUIRE ↗` CTA further reinforced a "selling services" posture that is not who Amzad is.
+
+### New Direction
+Dark aesthetic with light geometric forms and a single restrained muted-electric-blue accent.
+
+- **Background**: deep charcoal `#0D0F12` (NOT pure black, so OLED smear is avoided and depth is preserved)
+- **Secondary surface**: `#131619` (used for Research, Education, Leadership section bands)
+- **Card / elevated surface**: `#15181D` (publication card, education rows, awards section)
+- **Foreground text**: `#F2F3F5` (soft warm off-white, not pure white — preserves editorial warmth)
+- **Muted text**: `#A7ADB7` (cool muted gray — passes AAA 8.8:1 on the new background)
+- **Accent**: muted electric blue `#6E8AF5` (single restrained accent — chosen over violet/cyan/green for its resonance with research/data visualization conventions)
+- **Borders**: `rgba(242, 243, 245, 0.10)` (white at low opacity — quiet hairlines)
+
+### Positioning Change
+The portfolio now presents Amzad Pinso as:
+- **CSE Student** (the highest-signal identity word, now in `profile.role`)
+- **Undergraduate Teaching Assistant** (`profile.subRole` — surfaced in hero floating label)
+- **AI / Research Enthusiast** (tagline `AI · Research · Teaching` under the display name)
+- **Technical learner** (hero statement reframed around *exploring*, *learning through*)
+
+It no longer presents him as a service provider or freelancer:
+- Removed `ENQUIRE ↗` CTA from projects (replaced with `READ MORE ↗` → `#research`)
+- Reordered hero CTAs: `EXPLORE RESEARCH →` is now the primary (filled) CTA, demoting `VIEW PROJECTS →` to secondary (outlined)
+- Removed the "Selected Projects" title — renamed to "Research & Technical Work"
+- Removed the agency-style "Building intelligent systems... turning research ideas into practical technology" hero statement — replaced with the learner-forward "Exploring intelligent systems... learning through research, teaching, and technical projects."
+- Updated Contact section headline from "Interested in research, technology, collaboration, or building something meaningful?" to "Research, technology, learning, and meaningful conversations are always welcome."
+- Updated Footer to add a new identity line `AI · Research · Teaching · Technology` in accent color
+- Removed the cream inverted Awards + Footer — both now stay in the dark system (`bg-card` for Awards, `bg-background` for Footer)
+
+### Visual Changes
+
+#### Color System (globals.css)
+- Replaced entire `:root` block with the new dark palette
+- Added new tokens: `--shape-outline` (`rgba(242, 243, 245, 0.06)`), `--shape-outline-strong` (`rgba(242, 243, 245, 0.10)`), `--shape-glow` (`rgba(110, 138, 245, 0.10)`), `--grid-line` (`rgba(242, 243, 245, 0.04)`) for light geometric forms
+- Mirrored tokens in `.dark` block (so any future theme toggle is safe)
+- Added layered atmospheric depth on `body`: radial accent glow at top + faint SVG noise (mix-blend-mode automatically inverted for dark)
+- Updated scrollbar thumb to `rgba(242, 243, 245, 0.16)` for visibility on dark
+- Added Firefox `scrollbar-width: thin` + `scrollbar-color`
+- Added explicit `*:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }` for keyboard navigation on dark
+
+#### Typography (layout.tsx + globals.css)
+- Replaced `Playfair_Display` (fashion-magazine Didone) with **Newsreader** — a serif designed for digital editorial reading with a Display optical size variant that handles 11rem hero text gracefully, and sturdy numerals for stats blocks
+- Replaced `JetBrains_Mono` (developer / VS Code) with **IBM Plex Mono** — designed by IBM for research publications, communicates "intelligent, technical, trustworthy"
+- Kept **Inter** for body (superior screen hinting, already correct)
+- Updated fluid typography utilities:
+  - `.text-display` — Newsreader 600, `clamp(3rem, 11vw, 10.5rem)`, line-height 0.92, letter-spacing -0.02em (looser than -0.04em to avoid the "spread" effect of dark backgrounds)
+  - `.text-display-md` — Newsreader 600, `clamp(2.5rem, 7vw, 6rem)`, line-height 0.96, letter-spacing -0.018em
+  - `.text-headline` — Newsreader 500, `clamp(1.75rem, 4vw, 3.25rem)`, line-height 1.05, letter-spacing -0.012em
+  - `.text-eyebrow` — IBM Plex Mono 500, 0.6875rem, letter-spacing 0.18em (tightened from 0.2em — less "billboard")
+  - Added `text-wrap: balance` on display/headline for cleaner line breaks
+  - Added `font-variant-numeric: tabular-nums` on section-number for aligned `01`–`10`
+
+#### Section Headings (Reveal.tsx)
+- Changed from `(01) ABOUT` to `§ 01 — About` — `§` (section sign) is the academic/legal convention and reads as "research paper section heading" rather than "billboard". Number stays mono+accent, label stays mono+uppercase+foreground for consistency.
+
+#### Cards (About stats, Education rows, Leadership, Skills, Publication)
+- Background: `bg-background` → `bg-card` for elevated cards; `bg-secondary` for section-band cards
+- Hover: switched from full-color inversion (`bg-background → bg-foreground`) to a subtle 1-step surface lift (`bg-background → bg-secondary` or `bg-card`), with border brightening (`hover:border-accent/40`) — no flashing on dark
+- Removed `hover:-translate-x/y` shifts on hover (kept `translate-x-0.5` only on Skills items for a 2px nudge)
+- Added scrim chips (`bg-background/50 backdrop-blur-sm`) for image overlay metadata — replaces the previous `text-background/80` which became invisible on the dark theme
+- Added a left accent rule (`w-1 bg-accent`) to the featured publication card to signal "featured publication"
+- Added an `ABSTRACT` eyebrow + italic body + left hairline to the publication abstract paragraph — gives the card a "research paper" feel
+
+#### Hero Background Treatment
+- Added a giant thin outlined circle (1px stroke, `rgba(242, 243, 245, 0.06)`) bleeding off the top edge — scales in from `1.15 → 1` on load over 1.5s
+- Added a soft accent radial highlight at top-right (where the location label sits)
+- Reduced the grid from 13 columns @ 0.06 opacity to 6 columns @ 0.04 opacity — quieter
+- Added 3 floating geometric forms (plus sign `+`, 3×3 dot grid, hairline tick) on desktop — each with a 4-second slow opacity pulse (1 → 0.4 → 1, staggered delays) as ambient "research notebook" marginalia
+- Added a soft accent tint overlay (`mix-blend-overlay`, 0.08 opacity) + dark vignette (`mix-blend-multiply`, radial `rgba(13, 15, 18, 0.55)` at edges) on the portrait — blends the grayscale image into the dark background rather than sitting as a bright rectangular slab
+- Added a thin accent frame (`inset-2`, `color-mix(in oklab, var(--accent) 50%, transparent)`) around the portrait — gallery/wall-label treatment rather than product glow
+
+#### Section Background Variation (depth without distraction)
+- Hero, About, Projects, Experience, Skills, Leadership, Contact: `bg-background` (base)
+- Research, Education, Leadership: `bg-secondary` (1-step lift, creates editorial rhythm)
+- Awards: `bg-card` (elevated) — kept dark, no longer inverted to cream
+- Footer: `bg-background` with subtle accent radial at top
+- Each `bg-background` section gets a `<div className="bg-glow" aria-hidden />` — a slow (22s) drifting radial accent glow at 0.4–0.6 opacity for atmospheric depth. Respects reduced-motion (animation pauses).
+
+#### Light Forms (new reusable component `LightForm`)
+- Added to `Reveal.tsx`: a `<LightForm>` wrapper for decorative SVGs — scales in (0.96 → 1) + opacity (0 → 0.55) over 1.5s with `[0.22, 1, 0.36, 1]` easing. Inner paths can animate `pathLength 0 → 1` for a quiet stroke-draw effect. Final opacity 0.55 (background typography, not foreground content).
+- Used in About section: a 420×420 thin outlined circle (2 nested rings) behind the portrait, on desktop only
+- Used implicitly in Hero via the giant outlined circle behind the name
+
+### Content Changes
+
+#### `src/data/profile.ts`
+- `role`: `"Computer Science & Engineering"` → `"Computer Science & Engineering Student"` (added "Student")
+- Added `subRole`: `"Undergraduate Teaching Assistant"` (rendered in hero floating label)
+- Added `tagline`: `"AI · Research · Teaching"` (rendered under the display name)
+- `statement`: rewrote from "Building intelligent systems... turning research ideas into practical technology" to "Exploring intelligent systems, explainable AI, healthcare analytics, and software engineering while learning through research, teaching, and technical projects."
+- `bio`: tightened to abbreviate IIUC for hero brevity (full name lives in About)
+- `longBio`: removed "I work at the intersection..." opening; replaced with "As a CSE undergraduate at IIUC..." (more humble, learner-forward)
+- Added `universityShort`: `"IIUC"` (used in hero overlay metadata)
+
+#### `src/data/projects.ts`
+- Section title renamed from "Selected Projects" to "Research & Technical Work"
+- DiaXAI-Stack description rewritten as first-person research narrative: "A research framework I built to study whether diabetes prediction can be made both accurate and clinically trustworthy. I designed a leakage-free stacking ensemble... sits at the intersection of ensemble learning, explainable AI, and healthcare analytics — the throughline of my current research direction."
+- Placeholder projects: subtitle "Coming Soon" → "In Progress"; description updated to "Additional research and technical explorations are in progress. Details will be added here as results are verified and prepared for sharing." (more academic framing)
+- Added `"Interpretable ML"` to DiaXAI-Stack topics
+
+#### `src/components/hero/Hero.tsx`
+- New hero structure: role label → display name (with accent on `Pinso`) → tagline `AI · Research · Teaching` → statement → bio → portrait → 4 academic CTAs
+- 4 CTAs in priority order: `EXPLORE RESEARCH →` (filled), `VIEW PROJECTS →` (outlined), `DOWNLOAD CV ↓` (text link), `LINKEDIN ↗` (text link)
+- Removed `VIEW PROJECTS` as primary CTA — research is now the primary academic identity action
+- Added `min-h-[44px]` to all CTAs for touch-target compliance
+- Added `fetchPriority="high"` and `loading="eager"` on hero portrait (LCP optimization)
+- Subtler scroll transforms: `imageY 0→15%` (was 30%), `imageScale 1→1.05` (was 1.1), `textY 0→-10%` (was -25%), `opacity 1→0.3` floor (was 0 — no more full vanishing)
+- Subtler mouse parallax: `5px` shift (was 8px), `scale(1.08)` (was 1.12)
+- Portrait metadata uses scrim chips (`bg-background/50 backdrop-blur-sm text-foreground/80`) instead of `text-background/80` (which was invisible on dark)
+
+#### `src/components/projects/FeaturedProjects.tsx`
+- Removed `ENQUIRE ↗` CTA entirely (the only commercial-language CTA in the codebase)
+- Real project without href: `READ MORE ↗` → `#research` (academic vocabulary)
+- Placeholder projects: "Coming Soon" → "In Progress" badge (more academic)
+- Section heading: `Selected Projects` → `Research & Technical Work`
+- Section intro: rewrote to "A selection of research and personal technical explorations — work focused on explainable AI, predictive modeling, and applied machine learning, with attention to interpretability and clinical applicability."
+- Replaced parent `gap-px bg-border` with `divide-y divide-border` for cleaner separation
+- Updated project visual area: `from-foreground/5 to-foreground/15` gradient (cream-tinted, became low-contrast on dark) replaced with `bg-secondary` solid surface
+- SVG grid opacity bumped from 0.08 to 0.12 for dark legibility
+
+#### `src/components/research/ResearchSection.tsx`
+- Section background: `bg-secondary/40` → `bg-secondary` (full opacity for visible differentiation in dark)
+- Added left accent rule (`w-1 bg-accent`) on the featured publication card
+- Added `Featured Publication` eyebrow (was lowercase "PUBLICATION" eyebrow)
+- Added an `ABSTRACT` eyebrow + italic body + left hairline around the publication abstract paragraph
+- Bumped publication card padding from `p-10 lg:p-12` to `p-10 lg:p-14` for more presence
+- Updated SVG visualization: light forms (`text-foreground`) at 0.5 opacity (was 0.4) — slightly more visible on dark
+- Demoted year from `text-5xl md:text-6xl` to `text-5xl md:text-6xl` with `tabular-nums` for cleaner numerals
+
+#### `src/components/contact/ContactSection.tsx`
+- Headline: "Interested in research, technology, collaboration, or building something meaningful?" → "Research, technology, learning, and meaningful conversations are always welcome."
+- Sub-text: "I'm always open to discussing AI research, teaching collaborations, internships, and projects..." → "Reach out through any of the channels below — for academic discussion, research collaboration, teaching exchange, or simply to connect."
+- Added `font-medium` to the contact method links for stronger presence on dark
+
+#### `src/components/footer/Footer.tsx`
+- Switched from inverted (`bg-foreground text-background`) to dark `bg-background text-foreground` — no more "page lights up at the end" effect
+- Added a new identity line below the university: `AI · Research · Teaching · Technology` in accent color
+- Removed `text-background/60` opacity-based greys (muddy on dark) — switched to `text-muted-foreground`
+- Added a subtle accent radial at the top to mirror the contact section glow (bookend effect)
+
+#### `src/app/layout.tsx`
+- Updated title: `"Amzad Pinso — CSE Student | AI Researcher | Teaching Assistant"` → `"Amzad Pinso — CSE Student · AI Researcher · Teaching Assistant"` (pipe to middle-dot, mirrors the tagline visually)
+- Added `"Teaching"` and `"Software Engineering"` to keywords array
+- Updated `structuredData.jobTitle` to include "Student" framing
+- Added `Teaching` and `Software Engineering` to `structuredData.knowsAbout`
+- Added `description` field to JSON-LD Person schema (academic voice)
+- Added `themeColor: "#0D0F12"` to viewport export (mobile browser chrome matches dark theme)
+
+#### `src/components/navigation/Navbar.tsx`
+- Fixed: added missing `onClick={() => setMenuOpen((v) => !v)}` on the hamburger button (was previously missing — the menu could not be opened on mobile)
+- Added `id="mobile-menu" role="dialog" aria-modal="true" aria-label="Main navigation"` to mobile menu panel
+- Added Escape-to-close handler (`keydown` listener when menu is open)
+- Bumped hamburger button to `w-11 h-11` (44px touch target minimum)
+- Added `overflow-y-auto` to mobile menu container
+- Added `backdrop-blur-md bg-background/95` to mobile menu (lets page bleed through subtly)
+- Added `min-h-[44px]` to all nav links and the CV button for touch-target compliance
+- Logo switched from `font-mono text-eyebrow` to `font-display text-sm tracking-[0.16em]` (Newsreader serif logo — more academic than mono)
+
+### Files Modified
+
+- `src/app/globals.css` — full dark palette + light form utilities + cursor + scrollbar + focus-visible + bg-glow keyframes
+- `src/app/layout.tsx` — Newsreader + IBM Plex Mono + academic SEO metadata + themeColor viewport
+- `src/app/page.tsx` — preloader scroll lock 2000ms → 1400ms
+- `src/data/profile.ts` — added Student/subRole/tagline; rewrote statement, bio, longBio for academic voice
+- `src/data/projects.ts` — academic rewrite of DiaXAI-Stack description; placeholder copy softened
+- `src/components/animation/Reveal.tsx` — unified animation constants; subtler Reveal/StaggerItem (y 16, 0.8s); MagneticButton strength 0.35→0.22; ScrollProgress respects reduced-motion; new `LightForm` component; SectionHeading switched to `§ N — Label` academic style
+- `src/components/animation/CursorFollower.tsx` — cursor ring 36→32 default, 64→52 on hover; opacity 0.85→0.7 on hover; damping 28→30 (less wobble); uses `SPRING_CURSOR` constant
+- `src/components/preloader/Preloader.tsx` — duration 1800ms→1100ms; hold 250ms→150ms; exit 0.6s→0.5s
+- `src/components/hero/Hero.tsx` — full redesign with academic positioning, new CTAs, light geometric forms, scrim-chip metadata, subtler parallax
+- `src/components/about/AboutSection.tsx` — dark theme; new heading (no "I work at the intersection..."); LightForm behind portrait; scrim-chip metadata; subtle hover (no full color invert)
+- `src/components/research/ResearchSection.tsx` — `bg-secondary` full; left accent rule on publication card; ABSTRACT blockquote; repositioned intro
+- `src/components/projects/FeaturedProjects.tsx` — "Research & Technical Work" heading; academic project descriptions; READ MORE CTA (no ENQUIRE); `divide-y` separators; `bg-secondary` visual area
+- `src/components/experience/ExperienceTimeline.tsx` — accent-tinted vertical line; dot+accent on dark; unconditional `pl-10` to prevent mobile period collision with dot
+- `src/components/education/EducationTimeline.tsx` — `bg-secondary` band; `hover:bg-card` (visible lift on dark); tabular-nums on year + result
+- `src/components/skills/SkillsToolkit.tsx` — `bg-background`; tilt 8°→4°; spring 200/18→180/22; item shift 4px→2px; matchMedia guard for touch (via `useIsTouchDevice`); faint dotted grid background
+- `src/components/leadership/LeadershipSection.tsx` — `bg-secondary` band; `hover:bg-card` lift; focus chips hover to accent
+- `src/components/awards/AwardsSection.tsx` — `bg-card` (no more cream inversion); scroll-bound motion 0→-30% → 0→-22% (subtler); scroll-bound disabled on touch via `useIsTouchDevice` (falls back to `snap-x snap-mandatory overflow-x-auto`); accent radial at top
+- `src/components/contact/ContactSection.tsx` — academic headline; academic sub-text; radial glow mirror
+- `src/components/footer/Footer.tsx` — dark (not inverted); AI · Research · Teaching · Technology identity line in accent; subtle top radial
+- `src/components/navigation/Navbar.tsx` — added missing `onClick` on hamburger; Escape-to-close; aria-controls; 44px touch target; Newsreader serif logo; `min-h-[44px]` on links
+- `src/hooks/use-is-touch-device.ts` — NEW shared hook using `useSyncExternalStore` (avoids setState-in-effect lint errors in Awards + Skills)
+- `public/favicon.svg` — dark `#0D0F12` background with `#6E8AF5` accent dot
+- `public/images/me/me.jpg` — regenerated for dark academic palette (deep charcoal bg + accent diagonal wash + warm off-white silhouette) + recompressed from 207KB → 32KB (84% reduction)
+- `public/pdf/cv.pdf` — regenerated (minor copy update)
+- `scripts/gen_assets.py` — updated to produce dark-theme placeholder assets
+- `scripts/recompress_me.py` — NEW script to recompress me.jpg down to <150KB
+
+### Animation Decisions
+
+- **Unified animation constants** in `Reveal.tsx` (`EASE`, `REVEAL_DURATION`, `REVEAL_Y`, `SPRING_*`) — single source of truth for the whole site
+- **Subtler reveal**: `y 24 → 16`, `duration 0.7s → 0.8s` (less distance, more time = slower perceived velocity = more cinematic)
+- **Subtler magnetic**: `strength 0.35 → 0.22`, `damping 18 → 22` (less pull, less bounce)
+- **Subtler cursor ring**: `36 → 32` default, `64 → 52` on hover, `opacity 0.85 → 0.7` (no "look at me" feel)
+- **Subtler parallax**: image `30% → 15%`, scale `1.1 → 1.05`, text `-25% → -10%` (premium restraint)
+- **Subtler skills tilt**: `8° → 4°`, spring `200/18 → 180/22` (not bouncy)
+- **Shorter preloader**: `1800ms → 1100ms` (cuts the "TV spot" feel) + scroll lock 2000ms → 1400ms to match
+- **NEW: `bg-glow` keyframes** (22s ease-in-out alternate) — a soft accent-color radial that drifts laterally across each section. Adds depth without drawing attention. Respects reduced-motion.
+- **NEW: `LightForm` component** — slow (1.5s) scale-in + opacity fade for decorative geometric SVGs. Final opacity 0.55 — background typography, not foreground content. Used in About behind portrait.
+- **Reduced-motion fixes**: `ScrollProgress` now switches to a near-instant spring when reduced-motion is set; mobile menu clip-path is gated (snaps in reduced motion)
+
+### Testing
+
+#### Lint
+- `bun run lint` returns 0 errors, 0 warnings (after fixing 2 `setState-in-effect` lint errors via the new `useIsTouchDevice` hook using `useSyncExternalStore`)
+
+#### Build
+- Dev server starts cleanly: `Next.js 16.1.3 (Turbopack)` → `Ready in 631ms`
+- No hydration mismatches
+- No runtime errors in `dev.log` after the redesign (only Fast Refresh / HMR info logs)
+
+#### Static Assets (verified via `curl`)
+- `GET /images/me/me.jpg` → 200, 32813 bytes (was 207727 — 84% reduction)
+- `GET /pdf/cv.pdf` → 200, 889 bytes
+- `GET /favicon.svg` → 200, 321 bytes
+
+#### Agent Browser Visual Verification
+- Captured 11 desktop screenshots (1280×800) — one per section + footer
+- Captured 1 mobile hero screenshot (390×844)
+- Captured 1 mobile menu open screenshot (after fix)
+- All sections render with the dark palette: average sampled RGB per section ranges from (22, 26, 34) to (35, 38, 46) — confirmed dark
+- Zero console errors / warnings across full scroll
+- All 10 section IDs present and anchorable
+
+#### Source-code grep verification
+- `rg -i "hire me|let's work together|available for freelance|start a project|have a project|enquire|ENQUIRE" src/` → **0 matches** (all commercial language removed)
+- `rg "B8451F|F4F1EA|D97757|0A0A0A" src/` → **0 matches** (old cream palette fully removed)
+- `rg "F2F3F5|0D0F12|6E8AF5" src/app/globals.css` → 25+ matches (new dark palette applied)
+- `rg "Newsreader|newsreader|plex-mono|IBM_Plex_Mono" src/app/layout.tsx` → matches (new fonts in place)
+- `rg "Playfair|JetBrains" src/app/layout.tsx` → **0 matches** (old fonts removed)
+- `rg "EXPLORE RESEARCH|VIEW PROJECTS" src/components/hero/Hero.tsx` → matches (new academic CTAs)
+- `rg "Let's Connect" src/components/contact/ContactSection.tsx` → match
+- `rg "AI · Research · Teaching" src/components/hero/Hero.tsx` → match (the new tagline)
+- `rg "Research & Technical Work" src/components/projects/FeaturedProjects.tsx` → match (renamed section)
+- `rg "READ MORE" src/components/projects/FeaturedProjects.tsx` → match (replaced ENQUIRE)
+
+#### Mobile menu verification (after fix)
+- At 390×844: clicking the hamburger via `agent-browser click @e3` now opens the menu (`document.getElementById('mobile-menu')` returns "menu exists")
+- All mobile links have `min-h-[44px]` for touch-target compliance
+- Escape key closes the menu
+- Body scroll lock releases on close
+
+#### Accessibility verification (manual)
+- `prefers-reduced-motion` is respected globally (CSS catch-all) + per-component (useReducedMotion)
+- `*:focus-visible` outlines use accent color (`#6E8AF5`) — visible on dark
+- Mobile menu button has `aria-label`, `aria-expanded`, `aria-controls`
+- Mobile menu panel has `role="dialog"`, `aria-modal="true"`, `aria-label="Main navigation"`
+- All CTAs are real `<a>` tags (no JS-driven navigation)
+- Touch targets ≥ 44px (navbar hamburger, mobile links, CTAs)
+- Image alt updated to "Portrait of Amzad Pinso, Computer Science & Engineering student at IIUC"
+- Decorative SVGs and bg-glow have `aria-hidden="true"`
+- Contrast verification:
+  - `#F2F3F5` on `#0D0F12` → 17.9:1 (passes AAA)
+  - `#A7ADB7` on `#0D0F12` → 8.82:1 (passes AAA)
+  - `#6E8AF5` on `#0D0F12` → 6.40:1 (passes AA normal + AAA large)
+
+#### Performance verification
+- LCP optimization: hero portrait now has `fetchPriority="high"` + `loading="eager"` + `decoding="async"`
+- About portrait has `loading="lazy"` + `decoding="async"`
+- `me.jpg` recompressed from 207KB → 32KB (84% reduction) — well under the 150KB target
+- Font weights trimmed: Newsreader loads 4 weights (400, 500, 600, 700), IBM Plex Mono loads 3 (400, 500, 600) — was previously 6 + 3
+- All animations use transform/opacity (GPU-friendly)
+- `whileInView` with `once: true` (no re-trigger)
+- Spring-based cursor / magnetic motion tuned for snappy response
+
+### Git Commit
+
+`refactor: redesign portfolio visual identity and positioning` — applied after all fixes verified.

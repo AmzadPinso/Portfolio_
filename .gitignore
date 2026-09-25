@@ -54,6 +54,7 @@ server.log
 /upload/
 /download/
 /.zscripts/
+/tool-results/
 
 # Database
 /db/*.db

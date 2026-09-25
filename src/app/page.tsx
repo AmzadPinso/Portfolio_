@@ -24,7 +24,7 @@ export default function Home() {
     document.body.style.overflow = "hidden";
     const release = () => {
       const elapsed = Date.now() - start;
-      const wait = Math.max(0, 2000 - elapsed);
+      const wait = Math.max(0, 1400 - elapsed);
       setTimeout(() => {
         document.body.style.overflow = "";
       }, wait);

@@ -9,6 +9,7 @@ export interface Profile {
   lastName: string;
   role: string;
   subRole: string;
+  tagline: string;
   location: string;
   email: string;
   phone: string;
@@ -22,6 +23,7 @@ export interface Profile {
   semester: string;
   cgpa: string;
   university: string;
+  universityShort: string;
   department: string;
   researchFocus: string[];
   interest: { name: string; description: string };
@@ -31,8 +33,9 @@ export const profile: Profile = {
   name: "Amzad Pinso",
   firstName: "Amzad",
   lastName: "Pinso",
-  role: "Computer Science & Engineering",
-  subRole: "Teaching Assistant • AI & Research Enthusiast",
+  role: "Computer Science & Engineering Student",
+  subRole: "Undergraduate Teaching Assistant",
+  tagline: "AI · Research · Teaching",
   location: "Chattogram, Bangladesh",
   email: "contact.amzadpinso@gmail.com",
   phone: "+8801537290195",
@@ -41,13 +44,14 @@ export const profile: Profile = {
   cv: "/pdf/cv.pdf",
   image: "/images/me/me.jpg",
   statement:
-    "Building intelligent systems, exploring explainable AI, and turning research ideas into practical technology.",
-  bio: "Computer Science & Engineering undergraduate at International Islamic University Chittagong (IIUC) and undergraduate teaching assistant supporting artificial intelligence and database laboratory courses.",
+    "Exploring intelligent systems, explainable AI, healthcare analytics, and software engineering while learning through research, teaching, and technical projects.",
+  bio: "Computer Science & Engineering undergraduate at IIUC and undergraduate teaching assistant supporting AI and DBMS laboratory courses.",
   longBio:
-    "I work at the intersection of computer science, intelligent systems, research, and teaching. As a CSE undergraduate at IIUC, I support AI and DBMS laboratory courses while pursuing research in Explainable AI, ensemble learning, and healthcare analytics. My focus is on building models that are not only accurate but also interpretable and trustworthy for real-world clinical decision-making.",
+    "As a CSE undergraduate at IIUC, I support AI and DBMS laboratory courses while pursuing research in explainable AI, ensemble learning, and healthcare analytics — studying models that are accurate, interpretable, and clinically trustworthy. Beyond coursework and teaching, I am learning through technical projects, reading, and writing, with a focus on what makes intelligent systems reliable enough to use in real-world decisions.",
   semester: "7th Semester",
   cgpa: "3.66 / 4.00",
   university: "IIUC",
+  universityShort: "IIUC",
   department: "Department of Computer Science & Engineering",
   researchFocus: [
     "Explainable AI",

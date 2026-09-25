@@ -12,6 +12,21 @@ import {
 } from "motion/react";
 
 /* ────────────────────────────────────────────────────────────────
+ * Unified animation constants — subtle, intentional, cinematic.
+ * ──────────────────────────────────────────────────────────────── */
+export const EASE = [0.22, 1, 0.36, 1] as const;
+export const EASE_IN_OUT = [0.65, 0, 0.35, 1] as const;
+export const REVEAL_DURATION = 0.8;
+export const REVEAL_Y = 16; // subtler than 24
+export const TEXT_DURATION = 0.85;
+export const TEXT_STAGGER = 0.04;
+export const STAGGER_DEFAULT = 0.08;
+export const SPRING_MAGNETIC = { stiffness: 180, damping: 22, mass: 0.4 };
+export const SPRING_CURSOR = { stiffness: 220, damping: 30, mass: 0.5 };
+export const SPRING_PARALLAX = { stiffness: 120, damping: 30, mass: 0.4 };
+export const SPRING_PROGRESS = { stiffness: 140, damping: 24, restDelta: 0.001 };
+
+/* ────────────────────────────────────────────────────────────────
  * Reduced-motion hook — centralises the Motion helper.
  * ──────────────────────────────────────────────────────────────── */
 export function usePrefersReducedMotion() {
@@ -32,7 +47,7 @@ type RevealProps = MotionProps & {
 export function Reveal({
   children,
   delay = 0,
-  y = 24,
+  y = REVEAL_Y,
   once = true,
   className,
   ...rest
@@ -44,7 +59,7 @@ export function Reveal({
       initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
       whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
       viewport={{ once, margin: "-80px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: REVEAL_DURATION, delay, ease: EASE }}
       {...rest}
     >
       {children}
@@ -102,14 +117,14 @@ type StaggerItemProps = MotionProps & {
   className?: string;
 };
 
-export function StaggerItem({ children, y = 20, className, ...rest }: StaggerItemProps) {
+export function StaggerItem({ children, y = REVEAL_Y, className, ...rest }: StaggerItemProps) {
   const reduce = usePrefersReducedMotion();
   const item: Variants = {
     hidden: reduce ? { opacity: 0 } : { opacity: 0, y },
     show: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: REVEAL_DURATION, ease: EASE },
     },
   };
   return (
@@ -239,8 +254,8 @@ export function ParallaxImage({
     target: ref,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1.18, 1]);
+  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1.12, 1]);
 
   return (
     <motion.div
@@ -292,7 +307,7 @@ export function MagneticButton({
   href,
   onClick,
   className,
-  strength = 0.35,
+  strength = 0.22,
   download,
   target,
   rel,
@@ -300,8 +315,8 @@ export function MagneticButton({
 }: MagneticButtonProps) {
   const reduce = usePrefersReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  const x = useSpring(0, { stiffness: 200, damping: 18, mass: 0.4 });
-  const y = useSpring(0, { stiffness: 200, damping: 18, mass: 0.4 });
+  const x = useSpring(0, SPRING_MAGNETIC);
+  const y = useSpring(0, SPRING_MAGNETIC);
 
   function handleMove(e: React.MouseEvent) {
     if (reduce || !ref.current) return;
@@ -341,12 +356,12 @@ export function MagneticButton({
  * ScrollProgress — top-of-page reading progress bar.
  * ──────────────────────────────────────────────────────────────── */
 export function ScrollProgress() {
+  const reduce = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping: 24,
-    restDelta: 0.001,
-  });
+  const scaleX = useSpring(
+    scrollYProgress,
+    reduce ? { stiffness: 1, damping: 1, restDelta: 0.001 } : SPRING_PROGRESS,
+  );
   return (
     <motion.div
       aria-hidden
@@ -439,15 +454,48 @@ type SectionHeadingProps = {
 export function SectionHeading({ number, label, className }: SectionHeadingProps) {
   return (
     <Reveal className={className}>
-      <div className="flex items-center gap-3 mb-12 md:mb-16">
-        <span className="font-mono text-section-number text-muted-foreground">
-          ({number})
+      <div className="flex items-center gap-3 mb-14 md:mb-20">
+        <span className="font-mono text-section-number text-accent tabular-nums">
+          § {number}
         </span>
         <span className="font-mono text-section-number text-foreground uppercase tracking-widest">
-          {label}
+          — {label}
         </span>
         <span className="flex-1 h-px bg-border ml-2" aria-hidden />
       </div>
     </Reveal>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+ * LightForm — slow, restrained reveal for decorative geometric SVGs.
+ * Use behind content. Outer SVG scales in + fades; inner paths animate
+ * pathLength for a quiet stroke-draw effect.
+ * ──────────────────────────────────────────────────────────────── */
+type LightFormProps = {
+  className?: string;
+  delay?: number;
+  duration?: number;
+  children: React.ReactNode;
+};
+
+export function LightForm({
+  className,
+  delay = 0,
+  duration = 1.5,
+  children,
+}: LightFormProps) {
+  const reduce = usePrefersReducedMotion();
+  return (
+    <motion.svg
+      className={className}
+      initial={reduce ? { opacity: 0.5, scale: 1 } : { opacity: 0, scale: 0.96 }}
+      whileInView={reduce ? { opacity: 0.5, scale: 1 } : { opacity: 0.55, scale: 1 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration, delay, ease: EASE }}
+      aria-hidden
+    >
+      {children}
+    </motion.svg>
   );
 }

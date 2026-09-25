@@ -19,7 +19,7 @@ export function Preloader() {
       return () => clearTimeout(t);
     }
     const start = performance.now();
-    const duration = 1800;
+    const duration = 1100;
     let raf = 0;
     function step(now: number) {
       const t = Math.min(1, (now - start) / duration);
@@ -28,7 +28,7 @@ export function Preloader() {
       if (t < 1) {
         raf = requestAnimationFrame(step);
       } else {
-        setTimeout(() => setDone(true), 250);
+        setTimeout(() => setDone(true), 150);
       }
     }
     raf = requestAnimationFrame(step);
@@ -43,7 +43,7 @@ export function Preloader() {
           className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
+          transition={{ duration: 0.5, ease: [0.65, 0, 0.35, 1] }}
         >
           {/* Small label */}
           <motion.div

@@ -14,9 +14,12 @@ export function EducationTimeline() {
   return (
     <section
       id="education"
-      className="relative py-24 md:py-36 bg-background border-t border-border"
+      className="relative py-24 md:py-36 bg-secondary border-t border-b border-border overflow-hidden"
     >
-      <div className="container-editorial">
+      {/* Subtle drifting glow */}
+      <div className="bg-glow" aria-hidden />
+
+      <div className="container-editorial relative z-10">
         <SectionHeading number="06" label="Education" />
 
         <Reveal>
@@ -26,7 +29,10 @@ export function EducationTimeline() {
           </p>
         </Reveal>
 
-        <StaggerChildren className="flex flex-col gap-px bg-border" stagger={0.15}>
+        <StaggerChildren
+          className="flex flex-col gap-px bg-border"
+          stagger={0.15}
+        >
           {education.map((edu) => (
             <StaggerItem key={edu.id}>
               <EducationRow {...edu} />
@@ -50,17 +56,19 @@ function EducationRow({
   current,
 }: (typeof education)[number]) {
   const reduce = useReducedMotion();
-  // Parse a numeric prefix from result (e.g. "3.66 / 4.00" -> 3.66)
   const numericMatch = result.match(/^(\d+(?:\.\d+)?)/);
   const numericValue = numericMatch ? parseFloat(numericMatch[1]) : 0;
-  const decimals = numericMatch && numericMatch[1].includes(".") ? numericMatch[1].split(".")[1].length : 0;
+  const decimals =
+    numericMatch && numericMatch[1].includes(".")
+      ? numericMatch[1].split(".")[1].length
+      : 0;
   const suffix = result.replace(/^(\d+(?:\.\d+)?)/, "").trim();
 
   return (
-    <div className="bg-background grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 p-6 md:p-10 group hover:bg-card transition-colors duration-500">
+    <div className="bg-background grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 p-6 md:p-10 group hover:bg-card transition-colors duration-400">
       {/* Year range */}
       <div className="md:col-span-3">
-        <div className="font-mono text-eyebrow text-muted-foreground mb-2">
+        <div className="font-mono text-eyebrow text-muted-foreground mb-2 tabular-nums">
           {start} — {end}
         </div>
         {current && (
@@ -76,7 +84,7 @@ function EducationRow({
         <h3 className="font-display text-2xl md:text-3xl text-foreground leading-tight tracking-tight">
           {degree}
         </h3>
-        <div className="mt-2 font-mono text-eyebrow text-foreground/70">
+        <div className="mt-2 font-mono text-eyebrow text-foreground/80">
           {institution}
         </div>
         <div className="mt-1 font-mono text-eyebrow text-muted-foreground">
@@ -94,7 +102,7 @@ function EducationRow({
         <div className="font-mono text-eyebrow text-muted-foreground mb-2">
           {resultLabel}
         </div>
-        <div className="font-display text-4xl md:text-5xl text-foreground">
+        <div className="font-display text-4xl md:text-5xl text-foreground font-medium tabular-nums">
           {numericValue > 0 ? (
             <>
               <AnimatedCounter

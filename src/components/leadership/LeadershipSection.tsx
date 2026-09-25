@@ -12,9 +12,12 @@ export function LeadershipSection() {
   return (
     <section
       id="leadership"
-      className="relative py-24 md:py-36 bg-background border-t border-border"
+      className="relative py-24 md:py-36 bg-secondary border-t border-b border-border overflow-hidden"
     >
-      <div className="container-editorial">
+      {/* Subtle drifting glow */}
+      <div className="bg-glow" aria-hidden />
+
+      <div className="container-editorial relative z-10">
         <SectionHeading number="08" label="Leadership" />
 
         <Reveal>
@@ -29,7 +32,7 @@ export function LeadershipSection() {
           {leadership.map((lead) => (
             <StaggerChildren
               key={lead.id}
-              className="bg-background p-8 md:p-10 group relative overflow-hidden"
+              className="bg-background p-8 md:p-10 group relative overflow-hidden hover:bg-card transition-colors duration-400"
             >
               <StaggerItem>
                 <div className="font-mono text-eyebrow text-accent mb-3">

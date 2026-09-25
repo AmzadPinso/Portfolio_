@@ -13,21 +13,27 @@ export function ExperienceTimeline() {
   return (
     <section
       id="experience"
-      className="relative py-24 md:py-36 bg-background border-t border-border"
+      className="relative py-24 md:py-36 bg-background border-t border-b border-border overflow-hidden"
     >
-      <div className="container-editorial">
+      {/* Subtle drifting glow */}
+      <div className="bg-glow" aria-hidden />
+
+      <div className="container-editorial relative z-10">
         <SectionHeading number="04" label="Experience" />
 
         <Reveal>
           <p className="font-display text-headline text-foreground max-w-4xl mb-14 md:mb-20">
             Teaching, leadership, and community roles that shaped my approach to
-            collaboration, mentorship, and disciplined execution.
+            collaboration, mentorship, and disciplined practice.
           </p>
         </Reveal>
 
         <div className="relative">
-          {/* Vertical timeline line */}
-          <div className="absolute left-0 md:left-1/4 top-0 bottom-0 w-px bg-border" aria-hidden />
+          {/* Vertical timeline line — accent-tinted for the dark theme */}
+          <div
+            className="absolute left-2 md:left-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-accent/40 via-border to-border"
+            aria-hidden
+          />
 
           <StaggerChildren className="flex flex-col" stagger={0.12}>
             {experience.map((exp) => (
@@ -56,15 +62,15 @@ function ExperienceRow({
     <div className="relative grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-12 pb-12 md:pb-16">
       {/* Timeline dot */}
       <motion.span
-        className="absolute left-0 md:left-1/4 top-1.5 -translate-x-1/2 w-3 h-3 border-2 border-background bg-accent rounded-full z-10"
+        className="absolute left-2 md:left-1/4 top-1.5 -translate-x-1/2 w-3 h-3 border-2 border-background bg-accent rounded-full z-10"
         initial={reduce ? { opacity: 1 } : { scale: 0, opacity: 0 }}
         whileInView={reduce ? { opacity: 1 } : { scale: 1, opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.4 }}
       />
 
-      {/* Period */}
-      <div className="md:pl-8">
+      {/* Period — unconditional pl-10 to avoid collision with dot on mobile */}
+      <div className="pl-10 md:pl-8">
         <div className="font-mono text-eyebrow text-accent">{period}</div>
         {current && (
           <div className="mt-1 font-mono text-[10px] tracking-widest text-foreground/60 uppercase">
@@ -74,7 +80,7 @@ function ExperienceRow({
       </div>
 
       {/* Content */}
-      <div className="md:col-span-3">
+      <div className="md:col-span-3 pl-10 md:pl-0">
         <h3 className="font-display text-2xl md:text-3xl text-foreground leading-tight tracking-tight">
           {role}
         </h3>
@@ -88,7 +94,10 @@ function ExperienceRow({
         {highlights && highlights.length > 0 && (
           <ul className="mt-5 space-y-2">
             {highlights.map((h, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-foreground/80">
+              <li
+                key={i}
+                className="flex items-start gap-3 text-sm text-foreground/80"
+              >
                 <span className="mt-1.5 w-1 h-1 bg-accent shrink-0" />
                 <span>{h}</span>
               </li>
