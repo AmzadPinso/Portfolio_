@@ -338,19 +338,12 @@ function HeroPortrait({
       className="relative aspect-[4/5] w-full max-w-[280px] sm:max-w-[340px] md:max-w-[26vw] lg:max-w-[30vw] xl:max-w-[32vw]"
       style={{ y: portraitY, scale: portraitScale }}
     >
-      {/* ── Image layer with soft edge mask ───────────────────────
-          The radial-gradient mask fades the photo's edges to
-          transparent, so the photo blends seamlessly into the dark
-          page background regardless of its own background color. */}
-      <div
-        className="absolute inset-0 overflow-hidden"
-        style={{
-          maskImage:
-            "radial-gradient(ellipse 92% 92% at center, #000 65%, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 92% 92% at center, #000 65%, transparent 100%)",
-        }}
-      >
+      {/* ── Image layer ─────────────────────────────────────────────
+          The photo is shown clearly. object-position centers on the
+          subject's face/upper-body so the formal portrait is properly
+          composed in the 4:5 frame. No filters, no heavy mask — the
+          photo's own background is preserved as-is. */}
+      <div className="absolute inset-0 overflow-hidden">
         <Image
           src={src}
           alt="Amzad Pinso — formal portrait"
@@ -358,22 +351,14 @@ function HeroPortrait({
           priority
           quality={85}
           sizes="(min-width: 1280px) 32vw, (min-width: 1024px) 30vw, (min-width: 768px) 26vw, (min-width: 640px) 340px, 280px"
-          className="object-cover grayscale contrast-[1.05] brightness-95"
+          className="object-cover object-center"
           style={{
+            objectPosition: "center 25%",
             transform: reduce
               ? undefined
               : "translate(calc(var(--mx,0)*-5px), calc(var(--my,0)*-5px)) scale(1.08)",
             transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
           }}
-        />
-        {/* Dark vignette overlay — extra blending for light-background photos */}
-        <div
-          className="absolute inset-0 pointer-events-none mix-blend-multiply"
-          style={{
-            background:
-              "radial-gradient(circle at center, transparent 25%, rgba(13, 15, 18, 0.65) 100%)",
-          }}
-          aria-hidden
         />
       </div>
       {/* Thin accent frame — sits OUTSIDE the masked layer so it stays crisp */}

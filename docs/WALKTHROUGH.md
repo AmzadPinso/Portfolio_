@@ -1286,3 +1286,103 @@ No code changes needed. The Next.js Image optimizer will automatically serve the
 ### Git Commit
 
 `feat: integrate formal and personal portraits into hero and about sections`
+
+---
+
+## Photo Visibility Fix — Removed Aggressive CSS Filters + Cache Clear
+
+### Why
+The user reported "images are not still visible in the portfolio" after the real photos were uploaded. Investigation revealed TWO issues:
+
+1. **Source files were real photos** — both `public/images/me/formal.jpg` (50KB, 1048×1280, real studio portrait of a young man in a white button-down shirt) and `public/images/me/personal.jpg` (104KB, 960×1280, real candid photo of a young man in a "帝國" t-shirt with IIUC lanyard in a library) were confirmed real photographs via direct pixel sampling (18% skin tones in formal, 34% skin tones in personal) and via vision-model inspection.
+
+2. **The browser was rendering the OLD placeholder silhouette** because:
+   - The Next.js image optimizer had cached the previous placeholder images in `/home/z/my-project/.next/dev/cache/images/`
+   - The browser's HTTP cache also held stale responses
+   - When the real photos were swapped in at the same paths, both caches continued serving the old placeholder
+
+### Additional Issue Found
+The original CSS treatment I added (intended to "blend" the photos into the dark page) was actually **erasing the photo content**:
+- `grayscale` filter — drained all color from the photos
+- `brightness-95` — made the photos too dark
+- `mix-blend-multiply` overlay at 65% opacity with near-black color — multiplied mid-tones to near-invisible, only the brightest whites survived
+- Aggressive `radial-gradient` mask fading from 65% — only showed the center of the photo, hid everything else
+
+The combination meant the photos were technically loading but visually invisible — only the brightest white pixels (the formal photo's white background, the personal photo's white t-shirt graphic) bled through as abstract shapes against the dark page.
+
+### Fix Applied
+
+#### 1. Removed all aggressive CSS filters (Hero.tsx + AboutSection.tsx)
+- Removed `grayscale contrast-[1.05] brightness-95` class from the `<Image>` component
+- Removed the `mix-blend-multiply` dark vignette overlay (worst offender)
+- Removed the aggressive `radial-gradient` soft-edge mask that was fading the photo's edges to transparent
+- Kept only `object-cover` for proper aspect-ratio cropping
+
+#### 2. Added proper `object-position` for subject framing
+- Hero formal photo: `objectPosition: "center 25%"` — centers on the subject's face/upper body, not the center of the photo (which would crop off the head)
+- About personal photo: `objectPosition: "center 30%"` — same, frames the face properly
+
+#### 3. Lightened the bottom scrim on About
+- Changed the bottom scrim from `transparent 50% → rgba(13,15,18,0.55) 100%` to `transparent 75% → rgba(13,15,18,0.35) 100%` — only a subtle darkening at the very bottom for metadata legibility, not darkening half the photo
+
+#### 4. Cleared the Next.js image cache
+- `rm -rf /home/z/my-project/.next/dev/cache/images`
+- This forced the Next.js image optimizer to re-fetch the source files (which now contain the real photos) and re-generate the optimized variants
+
+#### 5. Hard-reloaded the browser
+- `agent-browser reload --bypass-cache` to bypass the browser's HTTP cache and force a fresh fetch
+
+### Verification (definitive)
+
+After the cache clear and CSS fix, I verified via direct Canvas pixel sampling of the rendered `<img>` elements:
+
+**Hero (formal.jpg) — sampled pixels:**
+- `rgb(248, 250, 247)` — near-white (the white studio backdrop)
+- `rgb(187, 184, 189)` — light gray (the white shirt)
+- `rgb(132, 71, 36)` — brown (skin tone — the person's face)
+- `rgb(178, 97, 47)` — brown (skin tone)
+- `rgb(180, 100, 42)` — brown (skin tone)
+- **18.2% skin-tone pixels** (definitively a real photo, not a placeholder which would have ~0%)
+
+**About (personal.jpg) — sampled pixels:**
+- `rgb(205, 197, 177)` — warm tan (library shelf or khaki pants)
+- `rgb(12, 21, 23)` — very dark (black t-shirt)
+- `rgb(22, 26, 20)` — very dark (black t-shirt)
+- `rgb(223, 159, 125)` — warm skin tone (the person's face)
+- `rgb(9, 9, 9)` — near black (black t-shirt)
+
+**Vision-model confirmation on extracted Canvas PNGs:**
+- Hero: Vision model confirmed "real photograph of a human male, face clearly visible (eyes, nose, mouth, eyebrows, facial hair), white button-down dress shirt, plain white studio backdrop"
+- About: Vision model confirmed "real candid photograph, young man in black t-shirt with white '帝國' Chinese characters, blue IIUC lanyard, library bookshelf background, smiling with teeth visible"
+
+### Files Modified
+
+- `src/components/hero/Hero.tsx` — removed aggressive filters and mask from `HeroPortrait`; added `objectPosition: "center 25%"` for proper face framing
+- `src/components/about/AboutSection.tsx` — removed aggressive filters and mask from the personal portrait; added `objectPosition: "center 30%"`; lightened the bottom scrim
+- `scripts/extract_rendered_img.py` — NEW utility script that extracts the actual rendered pixels of the hero `<img>` element via Canvas API (used for verification, kept for future debugging)
+
+### What Was Preserved
+
+- The 2-column hero composition (name left, portrait right, vertically centered)
+- The About editorial composition (text left, personal photo right with slight rotation)
+- The thin accent frame on both photos
+- The metadata chips (`IIUC · 7th Semester` / `CGPA 3.66/4.00` on hero, `Student life · Chattogram` on about)
+- The -1.5° counter-clockwise rotation on the About personal photo
+- The clip-path reveal entrance animations
+- The subtle scroll parallax
+- The mouse parallax on the hero portrait (desktop only)
+- The dark academic aesthetic (dark charcoal page background, soft white text, muted blue accent)
+- All other sections, navigation, animations, accessibility
+
+### Lesson Learned
+
+When integrating photos with their own backgrounds into a dark-themed page:
+- **Don't apply `grayscale` + `brightness` + `mix-blend-multiply` + heavy mask** — this erases the photo content
+- **Don't use `mix-blend-multiply` with dark overlay colors** — multiply mode darkens mid-tones multiplicatively, collapsing real photo content to near-black
+- **Trust the photo's own composition** — show it clearly with `object-cover` and proper `object-position` for face framing
+- **Use a thin accent border and subtle bottom scrim** for integration, not aggressive masking
+- **Clear the Next.js image cache when swapping source files at the same path** — `rm -rf .next/dev/cache/images`
+
+### Git Commit
+
+`fix: remove aggressive CSS filters and clear cache to make real photos visible`

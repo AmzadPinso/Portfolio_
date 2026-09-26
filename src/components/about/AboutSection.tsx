@@ -124,16 +124,15 @@ export function AboutSection() {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               >
-                {/* Image layer with soft edge mask for dark-bg blending */}
+                {/* Image layer — photo shown clearly with the subject's
+                    face/upper body properly composed in the frame. The
+                    photo's own colors are preserved (no filters). A thin
+                    accent border frames it like a gallery wall-label. */}
                 <div
                   className="absolute inset-0 overflow-hidden border"
                   style={{
                     borderColor:
                       "color-mix(in oklab, var(--accent) 30%, transparent)",
-                    maskImage:
-                      "radial-gradient(ellipse 95% 95% at center, #000 70%, transparent 100%)",
-                    WebkitMaskImage:
-                      "radial-gradient(ellipse 95% 95% at center, #000 70%, transparent 100%)",
                   }}
                 >
                   <Image
@@ -142,14 +141,15 @@ export function AboutSection() {
                     fill
                     quality={80}
                     sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, calc(100vw - 3rem)"
-                    className="object-cover grayscale contrast-[1.05] brightness-95"
+                    className="object-cover"
+                    style={{ objectPosition: "center 30%" }}
                   />
-                  {/* Subtle dark scrim at bottom for metadata legibility */}
+                  {/* Subtle dark scrim at bottom for metadata legibility only */}
                   <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
                       background:
-                        "linear-gradient(to bottom, transparent 50%, rgba(13, 15, 18, 0.55) 100%)",
+                        "linear-gradient(to bottom, transparent 75%, rgba(13, 15, 18, 0.35) 100%)",
                     }}
                     aria-hidden
                   />
