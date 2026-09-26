@@ -98,9 +98,11 @@ Built with **Next.js 16 + TypeScript + Tailwind CSS + Motion (Framer Motion)**, 
 │   └── use-is-touch-device.ts  # Shared hook (useSyncExternalStore) for touch detection
 │
 ├── public/
-│   ├── images/me/me.jpg     # Profile photo (dark-theme placeholder — REPLACE WITH YOUR PHOTO)
-│   ├── pdf/cv.pdf           # CV (placeholder — REPLACE WITH YOUR CV)
-│   └── favicon.svg          # Dark academic favicon with accent dot
+│   ├── images/me/formal.jpg   # Formal portrait (Hero) — REPLACE WITH YOUR PHOTO
+│   ├── images/me/personal.jpg  # Personal photo (About) — REPLACE WITH YOUR PHOTO
+│   ├── images/me/me.jpg        # Original placeholder (kept for reference)
+│   ├── pdf/cv.pdf              # CV (placeholder — REPLACE WITH YOUR CV)
+│   └── favicon.svg             # Dark academic favicon with accent dot
 │
 ├── scripts/
 │   ├── gen_assets.py        # Generates placeholder me.jpg + cv.pdf (dark theme)
@@ -125,7 +127,8 @@ Built with **Next.js 16 + TypeScript + Tailwind CSS + Motion (Framer Motion)**, 
 | Leadership roles | `src/data/leadership.ts` |
 | Awards | `src/data/awards.ts` |
 | Contact channels (email/phone/LinkedIn/CV) | `src/data/socials.ts` |
-| Profile photo | `public/images/me/me.jpg` |
+| Profile photo (Hero, formal portrait) | `public/images/me/formal.jpg` |
+| Profile photo (About, personal/student life) | `public/images/me/personal.jpg` |
 | CV | `public/pdf/cv.pdf` |
 | SEO metadata | `src/app/layout.tsx` |
 | Design tokens (colors, fonts, spacing) | `src/app/globals.css` |

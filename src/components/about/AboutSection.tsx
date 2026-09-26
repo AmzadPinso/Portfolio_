@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
-import { profile } from "@/data/profile";
+import { profile, profileImages } from "@/data/profile";
 import {
   Reveal,
   SectionHeading,
@@ -102,38 +103,62 @@ export function AboutSection() {
               />
             </LightForm>
 
+            {/* Personal photo — editorial composition with slight rotation,
+                thin accent border, and the LightForm circle behind it for
+                depth. Sits beside the About text on desktop, stacks on mobile.
+                The personal photo contrasts the formal hero portrait — the
+                eye reads HERO (professional) → ABOUT (personal / student life). */}
             <Reveal delay={0.2} className="relative">
-              <div className="relative aspect-[4/5] w-full max-w-[400px] overflow-hidden">
-                <motion.img
-                  src={profile.image}
-                  alt="Amzad Pinso — portrait"
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover grayscale contrast-[1.05] brightness-95"
-                  initial={
-                    reduce
-                      ? { opacity: 0 }
-                      : { clipPath: "inset(0 100% 0 0)" }
-                  }
-                  whileInView={
-                    reduce ? { opacity: 1 } : { clipPath: "inset(0 0% 0 0)" }
-                  }
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                />
-                {/* Subtle dark vignette */}
+              <motion.div
+                className="relative aspect-[4/5] w-full max-w-[400px] mx-auto lg:mx-0 lg:ml-auto"
+                initial={
+                  reduce
+                    ? { opacity: 0 }
+                    : { opacity: 0, rotate: -3, scale: 0.92 }
+                }
+                whileInView={
+                  reduce
+                    ? { opacity: 1 }
+                    : { opacity: 1, rotate: -1.5, scale: 1 }
+                }
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {/* Image layer with soft edge mask for dark-bg blending */}
                 <div
-                  className="absolute inset-0 pointer-events-none mix-blend-multiply"
+                  className="absolute inset-0 overflow-hidden border"
                   style={{
-                    background:
-                      "radial-gradient(circle at center, transparent 30%, rgba(13, 15, 18, 0.45) 100%)",
+                    borderColor:
+                      "color-mix(in oklab, var(--accent) 30%, transparent)",
+                    maskImage:
+                      "radial-gradient(ellipse 95% 95% at center, #000 70%, transparent 100%)",
+                    WebkitMaskImage:
+                      "radial-gradient(ellipse 95% 95% at center, #000 70%, transparent 100%)",
                   }}
-                  aria-hidden
-                />
-                <div className="absolute bottom-3 left-3 font-mono text-[10px] tracking-widest uppercase px-2 py-1 bg-background/50 backdrop-blur-sm text-foreground/80">
-                  Student · Researcher · Educator
+                >
+                  <Image
+                    src={profileImages.personal}
+                    alt="Amzad Pinso — personal portrait"
+                    fill
+                    quality={80}
+                    sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, calc(100vw - 3rem)"
+                    className="object-cover grayscale contrast-[1.05] brightness-95"
+                  />
+                  {/* Subtle dark scrim at bottom for metadata legibility */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background:
+                        "linear-gradient(to bottom, transparent 50%, rgba(13, 15, 18, 0.55) 100%)",
+                    }}
+                    aria-hidden
+                  />
                 </div>
-              </div>
+                {/* Floating metadata — sits outside the masked layer */}
+                <div className="absolute bottom-3 left-3 font-mono text-[10px] tracking-widest uppercase z-10 px-2 py-1 bg-background/50 backdrop-blur-sm text-foreground/80">
+                  Student life · Chattogram
+                </div>
+              </motion.div>
             </Reveal>
 
             <StaggerChildren

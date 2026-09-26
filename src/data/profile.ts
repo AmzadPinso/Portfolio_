@@ -3,6 +3,26 @@
  * Edit this file to update name, contact, role, location, etc.
  */
 
+/**
+ * Profile images — centralised paths for the two personal photos.
+ *
+ * - `formal`:   the formal/professional portrait used in the Hero section.
+ * - `personal`: the personal/student-life photo used in the About section.
+ *
+ * Both files live in `public/images/me/`. Replace the placeholder files
+ * (currently copies of `me.jpg`) with the real photographs by overwriting
+ * them at the same paths — no code changes needed.
+ *
+ * Recommended dimensions:
+ * - formal.jpg:   800×1000 (4:5 portrait), < 200KB, JPEG quality ~78
+ * - personal.jpg: 1000×750 (4:3 landscape) or 800×1000 (4:5 portrait),
+ *                  < 200KB, JPEG quality ~78
+ */
+export const profileImages = {
+  formal: "/images/me/formal.jpg",
+  personal: "/images/me/personal.jpg",
+} as const;
+
 export interface Profile {
   name: string;
   firstName: string;

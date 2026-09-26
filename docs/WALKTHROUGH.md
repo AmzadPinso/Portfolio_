@@ -1088,3 +1088,201 @@ The portrait's reveal is synced to start slightly before the tagline (0.95s vs 1
 ### Git Commit
 
 `feat: integrate profile portrait into hero composition`
+
+---
+
+## Two Personal Photos Integration — Formal Hero Portrait + Personal About Portrait
+
+### Why
+The portfolio needed two distinct personal photographs to humanize the dark-academic identity:
+- **Formal portrait** — primary professional identity in the Hero (first impression)
+- **Personal portrait** — student/human side in the About section (visual storytelling)
+
+The two photos create a deliberate contrast: HERO reads as "professional Amzad", ABOUT reads as "personal / student Amzad". The eye travels HERO (formal) → ABOUT (personal) and understands both the professional and human sides of who Amzad is.
+
+### Centralised Image Paths
+Added `profileImages` constant to `src/data/profile.ts`:
+
+```ts
+export const profileImages = {
+  formal: "/images/me/formal.jpg",
+  personal: "/images/me/personal.jpg",
+} as const;
+```
+
+Both files live in `public/images/me/`. To swap in real photos, just overwrite the files at those paths — no code changes needed.
+
+### Photo Files
+- `public/images/me/formal.jpg` — formal/professional portrait (Hero)
+- `public/images/me/personal.jpg` — personal/student-life photo (About)
+- `public/images/me/me.jpg` — original placeholder (kept for reference / fallback)
+
+All three are currently 32KB JPEGs at 800×1000 (4:5 portrait). When the real photos arrive, they should be optimized to:
+- formal.jpg: 800×1000 (4:5 portrait), < 200KB, JPEG quality ~78
+- personal.jpg: 1000×750 (4:3 landscape) or 800×1000 (4:5 portrait), < 200KB, JPEG quality ~78
+
+### Hero Integration (Formal Portrait)
+
+**File**: `src/components/hero/Hero.tsx`
+
+Changes:
+- Switched from regular `<img>` to Next.js `<Image>` component with `fill` + `priority` + `quality={85}` + responsive `sizes` attribute
+- Updated `src` from `profile.image` (`/images/me/me.jpg`) to `profileImages.formal` (`/images/me/formal.jpg`)
+- Updated `alt` to "Amzad Pinso — formal portrait"
+- Added a **soft edge mask** (`maskImage: radial-gradient(ellipse 92% 92% at center, #000 65%, transparent 100%)`) to the image layer so the photo's edges fade to transparent and blend seamlessly into the dark page — works regardless of the photo's own background color (designed for the formal photo's clean light background, but degrades gracefully for any photo)
+- Strengthened the dark vignette (`rgba(13, 15, 18, 0.65)` at edges, up from 0.55) for extra blending of light backgrounds
+- Restructured the portrait into two layers:
+  1. **Inner masked layer** — contains the Image + dark vignette. Both are masked together so the photo's edges fade naturally.
+  2. **Outer layer** — contains the thin accent frame (inset 3px) and the metadata chips (IIUC · 7th Semester, CGPA 3.66/4.00). These sit OUTSIDE the mask so they stay crisp.
+
+### About Integration (Personal Portrait)
+
+**File**: `src/components/about/AboutSection.tsx`
+
+Changes:
+- Switched from `motion.img` to Next.js `<Image>` component with `fill` + lazy loading + `quality={80}` + responsive `sizes` attribute
+- Updated `src` to `profileImages.personal` (`/images/me/personal.jpg`)
+- Updated `alt` to "Amzad Pinso — personal portrait"
+- Replaced the previous rectangular card with an **editorial composition**:
+  - **Slight rotation**: `-1.5deg` counter-clockwise (animates from -3deg → -1.5deg on reveal for a settling effect) — breaks the rectangular feel, suggests a casual captured moment
+  - **Soft edge mask**: `radial-gradient(ellipse 95% 95% at center, #000 70%, transparent 100%)` — fades edges into the dark background
+  - **Thin accent border**: `1px solid color-mix(in oklab, var(--accent) 30%, transparent)` — subtle gallery wall-label
+  - **Dark scrim at bottom**: `linear-gradient(to bottom, transparent 50%, rgba(13, 15, 18, 0.55) 100%)` — for metadata legibility
+  - **LightForm circle** behind the photo (already existed) — creates depth, the rotated photo appears to float over the geometric outline
+  - **Floating metadata chip**: "Student life · Chattogram" (replaces the previous "Student · Researcher · Educator" — the new label is more personal/less formal, matches the casual photo intent)
+- Animation: entrance from `opacity: 0, rotate: -3deg, scale: 0.92` → `opacity: 1, rotate: -1.5deg, scale: 1` over 1.2s with ease-out — settles into the final rotated state smoothly
+
+### Next.js Image Configuration
+
+**File**: `next.config.ts`
+
+Added `images.qualities` config to allow the `quality={85}` (hero) and `quality={80}` (about) props:
+
+```ts
+images: {
+  qualities: [75, 80, 85],
+},
+```
+
+Without this, Next.js would warn that the quality values aren't in the allowed list and fall back to 75. With this config, the intended quality values are applied.
+
+### Responsive `sizes` Attributes
+
+**Hero portrait** (formal):
+```
+sizes="(min-width: 1280px) 32vw, (min-width: 1024px) 30vw, (min-width: 768px) 26vw, (min-width: 640px) 340px, 280px"
+```
+This tells Next.js Image to serve:
+- 32vw of viewport width at ≥1280px (≈ 410px on a 1280px viewport)
+- 30vw at ≥1024px (≈ 307px on a 1024px viewport)
+- 26vw at ≥768px (≈ 200px on a 768px viewport)
+- 340px at ≥640px
+- 280px at <640px
+
+**About portrait** (personal):
+```
+sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, calc(100vw - 3rem)"
+```
+This tells Next.js Image to serve:
+- 400px at ≥1024px (the `max-w-[400px]` cap)
+- 50vw at ≥768px (tablet)
+- `calc(100vw - 3rem)` at <768px (mobile, full width minus container padding)
+
+### Image Loading Strategy
+
+- **Hero (formal)**: `priority` prop — image is preloaded eagerly as the LCP candidate. Combined with the existing `fetchPriority="high"` behavior of next/image with `priority`.
+- **About (personal)**: lazy by default (no `priority` prop) — image loads only when scrolled near the viewport, saving bandwidth on initial page load.
+
+### Soft Edge Mask — Why This Approach
+
+The formal photo is described as having a clean light background. Simply placing a rectangular photo on the dark page would create a jarring bright rectangle. Three approaches were considered:
+
+1. **Strong dark vignette overlay** — darkens edges via `mix-blend-multiply`. Works for photos with mid-tone backgrounds, but a pure white background would still show through too brightly at the center.
+2. **CSS `mask-image` with radial-gradient** — fades the photo's edges to transparent, letting the dark page bg show through. Works regardless of the photo's background color. Chosen approach.
+3. **Gradient border** — a border that fades from opaque to transparent. Doesn't actually fade the photo content, just the border.
+
+The `mask-image` approach is the most robust. It's applied to a wrapper div around the Image (not the Image itself) so the mask fades everything inside — the photo AND any overlay vignette — together. The accent frame and metadata chips sit OUTSIDE the masked layer so they remain crisp and visible.
+
+Browser support: `mask-image` with `radial-gradient` is supported in 95%+ of modern browsers (Chrome, Firefox, Safari, Edge). The `-webkit-mask-image` prefix is included for older Safari/Chrome.
+
+### Files Modified
+
+- `src/data/profile.ts` — added `profileImages` constant with `formal` and `personal` paths
+- `src/components/hero/Hero.tsx`:
+  - Added `import Image from "next/image"`
+  - Added `profileImages` to the import from `@/data/profile`
+  - Changed `src={profile.image}` → `src={profileImages.formal}` in the HeroPortrait call
+  - Updated `HeroPortrait` component: switched from `<img>` to `<Image>`, added soft edge mask layer, strengthened dark vignette, moved accent frame + metadata outside the masked layer, updated alt to "Amzad Pinso — formal portrait"
+- `src/components/about/AboutSection.tsx`:
+  - Added `import Image from "next/image"`
+  - Added `profileImages` to the import from `@/data/profile`
+  - Replaced `motion.img` with `Image` (with `fill` + lazy + `quality={80}` + sizes)
+  - Changed `src={profile.image}` → `src={profileImages.personal}`
+  - Added editorial composition: `rotate: -1.5deg` animation, thin accent border, soft edge mask, dark scrim at bottom, "Student life · Chattogram" metadata chip
+  - Updated alt to "Amzad Pinso — personal portrait"
+- `next.config.ts` — added `images.qualities: [75, 80, 85]` config
+- `public/images/me/formal.jpg` — created (currently a copy of me.jpg as placeholder)
+- `public/images/me/personal.jpg` — created (currently a copy of me.jpg as placeholder)
+
+### What Was Preserved
+
+- All existing hero animations (letter stagger, scroll parallax, mouse parallax, scroll indicator)
+- All existing hero composition (2-column name + portrait, vertically centered via `items-center`)
+- All existing hero typography (Newsreader display + IBM Plex Mono eyebrow + Inter body)
+- All existing hero floating metadata labels (Chattogram, Bangladesh + Undergraduate Teaching Assistant)
+- All existing hero CTAs (EXPLORE RESEARCH, VIEW PROJECTS, DOWNLOAD CV, LINKEDIN)
+- All existing hero background decorative shapes (giant circle, dot grid, plus sign, hairline tick)
+- All existing About section structure (SectionHeading, stats grid, chess interest card)
+- All existing About LightForm circle behind the portrait
+- All existing accessibility (aria-labels, focus-visible, reduced-motion, 44px touch targets)
+- Dark academic color palette and typography tokens
+
+### Testing
+
+#### Lint
+- `bun run lint` returns 0 errors, 0 warnings
+
+#### Build
+- Dev server compiles cleanly after `next.config.ts` update
+- No hydration mismatches, no runtime errors in `dev.log`
+- Quality warnings resolved (no longer appear in console after `images.qualities` config)
+
+#### Static Assets (verified via curl)
+- `GET /images/me/formal.jpg` → 200, 32813 bytes, `image/jpeg`
+- `GET /images/me/personal.jpg` → 200, 32813 bytes, `image/jpeg`
+- `GET /images/me/me.jpg` → 200, 32813 bytes (kept for reference)
+
+#### Agent Browser Visual Verification
+
+**Desktop 1280×800**
+- Hero portrait bounding rect: x=780, y=148, w=442, h=553 — renders correctly on the right side
+- Hero portrait src: `/_next/image?url=%2Fimages%2Fme%2Fformal.jpg&w=3840&q=85` — Next.js Image optimizer is being used
+- Hero portrait alt: "Amzad Pinso — formal portrait"
+- About portrait bounding rect: x=800, y=238, w=410, h=508 — renders in the right column
+- About portrait transform: `matrix(0.999657, -0.0261769, 0.0261769, 0.999657, 0, 0)` — confirmed rotation of exactly -1.5° counter-clockwise
+- About portrait border: `1px solid color-mix(in oklab, var(--accent) 30%, transparent)` — thin accent border
+- About portrait alt: "Amzad Pinso — personal portrait"
+
+**Mobile 390×844**
+- Hero portrait: stacked layout, x=38.8, y=315, w=302, h=378 — renders below AMZAD/PINSO
+- About portrait: stacked, x=15.5, y=1110, w=349, h=431 — rotation preserved
+- Both render correctly, no broken image icons
+
+#### No regressions
+- All 10 section IDs present: hero, about, research, projects, experience, education, skills, leadership, awards, contact
+- Zero console errors (after `next.config.ts` fix)
+- Dark aesthetic preserved — all section backgrounds sampled at rgb(13-21, 15-24, 18-29), no cream/white sections
+- All existing hero CTAs, navigation, floating labels, decorative shapes intact
+- All existing About structure (stats grid, chess interest card) intact
+
+### How to Swap in Real Photos
+
+When the real photos are available, simply overwrite the placeholder files:
+1. Replace `public/images/me/formal.jpg` with the real formal portrait (recommended 800×1000, JPEG quality ~78, < 200KB)
+2. Replace `public/images/me/personal.jpg` with the real personal photo (recommended 1000×750 or 800×1000, JPEG quality ~78, < 200KB)
+
+No code changes needed. The Next.js Image optimizer will automatically serve the new files at the configured quality and responsive sizes.
+
+### Git Commit
+
+`feat: integrate formal and personal portraits into hero and about sections`

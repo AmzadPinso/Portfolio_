@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   motion,
   useScroll,
   useTransform,
   useReducedMotion,
 } from "motion/react";
-import { profile } from "@/data/profile";
+import { profile, profileImages } from "@/data/profile";
 import { MagneticButton } from "@/components/animation/Reveal";
 
 export function Hero() {
@@ -211,7 +212,7 @@ export function Hero() {
               transition={{ delay: 0.95, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
               <HeroPortrait
-                src={profile.image}
+                src={profileImages.formal}
                 portraitY={portraitY}
                 portraitScale={portraitScale}
                 reduce={reduce}
@@ -307,10 +308,15 @@ export function Hero() {
  *
  * Treatment:
  * - Tall aspect ratio (4/5) for editorial portrait feel
- * - Grayscale + slight brightness reduction for cinematic mood
- * - Soft accent tint overlay for warmth
- * - Dark vignette to blend into the dark background
- * - Thin accent frame inset 8px (gallery wall-label)
+ * - Next.js Image with `fill` + `priority` + responsive `sizes`
+ * - Soft edge mask (radial-gradient) so the photo's edges fade
+ *   into the dark page — works regardless of the photo's own
+ *   background color (designed for the formal photo's clean light
+ *   background, but degrades gracefully for any photo)
+ * - Subtle grayscale + brightness reduction for cinematic mood
+ * - Dark vignette overlay for extra blending
+ * - Thin accent frame inset (gallery wall-label) — sits OUTSIDE
+ *   the masked layer so it stays crisp
  * - Scrim-chip metadata (IIUC, CGPA) for contrast on dark
  * - Subtle scroll parallax (slower than text for depth)
  * - Subtle mouse parallax (~5px) on desktop only
@@ -329,44 +335,50 @@ function HeroPortrait({
 }) {
   return (
     <motion.div
-      className="relative aspect-[4/5] w-full max-w-[280px] sm:max-w-[340px] md:max-w-[26vw] lg:max-w-[30vw] xl:max-w-[32vw] overflow-hidden"
+      className="relative aspect-[4/5] w-full max-w-[280px] sm:max-w-[340px] md:max-w-[26vw] lg:max-w-[30vw] xl:max-w-[32vw]"
       style={{ y: portraitY, scale: portraitScale }}
     >
-      <img
-        src={src}
-        alt="Portrait of Amzad Pinso, Computer Science & Engineering student at IIUC"
-        loading="eager"
-        decoding="async"
-        fetchPriority="high"
-        className="w-full h-full object-cover grayscale contrast-[1.05] brightness-95"
-        style={{
-          transform: reduce
-            ? undefined
-            : "translate(calc(var(--mx,0)*-5px), calc(var(--my,0)*-5px)) scale(1.08)",
-          transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
-        }}
-      />
-      {/* Soft accent tint — adds warmth on dark */}
+      {/* ── Image layer with soft edge mask ───────────────────────
+          The radial-gradient mask fades the photo's edges to
+          transparent, so the photo blends seamlessly into the dark
+          page background regardless of its own background color. */}
       <div
-        className="absolute inset-0 pointer-events-none mix-blend-overlay"
+        className="absolute inset-0 overflow-hidden"
         style={{
-          background: "var(--accent)",
-          opacity: 0.08,
+          maskImage:
+            "radial-gradient(ellipse 92% 92% at center, #000 65%, transparent 100%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 92% 92% at center, #000 65%, transparent 100%)",
         }}
-        aria-hidden
-      />
-      {/* Dark vignette — blends portrait into dark bg, soft edges */}
+      >
+        <Image
+          src={src}
+          alt="Amzad Pinso — formal portrait"
+          fill
+          priority
+          quality={85}
+          sizes="(min-width: 1280px) 32vw, (min-width: 1024px) 30vw, (min-width: 768px) 26vw, (min-width: 640px) 340px, 280px"
+          className="object-cover grayscale contrast-[1.05] brightness-95"
+          style={{
+            transform: reduce
+              ? undefined
+              : "translate(calc(var(--mx,0)*-5px), calc(var(--my,0)*-5px)) scale(1.08)",
+            transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+          }}
+        />
+        {/* Dark vignette overlay — extra blending for light-background photos */}
+        <div
+          className="absolute inset-0 pointer-events-none mix-blend-multiply"
+          style={{
+            background:
+              "radial-gradient(circle at center, transparent 25%, rgba(13, 15, 18, 0.65) 100%)",
+          }}
+          aria-hidden
+        />
+      </div>
+      {/* Thin accent frame — sits OUTSIDE the masked layer so it stays crisp */}
       <div
-        className="absolute inset-0 pointer-events-none mix-blend-multiply"
-        style={{
-          background:
-            "radial-gradient(circle at center, transparent 30%, rgba(13, 15, 18, 0.55) 100%)",
-        }}
-        aria-hidden
-      />
-      {/* Thin accent frame — gallery wall-label treatment */}
-      <div
-        className="absolute inset-2 pointer-events-none border"
+        className="absolute inset-3 pointer-events-none border"
         style={{
           borderColor: "color-mix(in oklab, var(--accent) 50%, transparent)",
         }}
