@@ -18,13 +18,14 @@ export function Hero() {
     offset: ["start start", "end start"],
   });
 
-  // Subtler scroll transforms (per audit)
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "15%"]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 1.05]);
+  // Subtle scroll transforms — kept from previous audit-driven refinements.
+  // Portrait moves slightly slower than text for depth (per request).
+  const portraitY = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "12%"]);
+  const portraitScale = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 1.04]);
   const textY = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "-10%"]);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 0.3]);
 
-  // Subtle mouse parallax (desktop only) — reduced from 8px to 5px
+  // Subtle mouse parallax on desktop only (kept subtle, ~5px)
   const mouseX = useRef(0);
   const mouseY = useRef(0);
   useEffect(() => {
@@ -58,24 +59,24 @@ export function Hero() {
         style={{ opacity }}
         aria-hidden
       >
-        {/* Giant thin outlined circle bleeding off the top */}
+        {/* Giant thin outlined circle bleeding off the top — sits behind the portrait */}
         <motion.svg
-          className="absolute -top-1/3 left-1/2 -translate-x-1/2 w-[180vw] h-[180vw] max-w-none max-h-none text-foreground"
+          className="absolute -top-1/4 right-[-15%] w-[140vw] h-[140vw] max-w-none max-h-none text-foreground hidden md:block"
           viewBox="0 0 100 100"
           fill="none"
-          initial={reduce ? { opacity: 0.08, scale: 1 } : { opacity: 0, scale: 1.15 }}
-          animate={{ opacity: 0.07, scale: 1 }}
+          initial={reduce ? { opacity: 0.06, scale: 1 } : { opacity: 0, scale: 1.15 }}
+          animate={{ opacity: 0.06, scale: 1 }}
           transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
         >
           <circle cx="50" cy="50" r="49" stroke="currentColor" strokeWidth="0.18" />
         </motion.svg>
 
-        {/* Subtle accent radial highlight — top right */}
+        {/* Subtle accent radial highlight — top right (warms portrait area) */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(circle at 85% 15%, rgba(110, 138, 245, 0.10), transparent 45%)",
+              "radial-gradient(circle at 80% 25%, rgba(110, 138, 245, 0.10), transparent 45%)",
           }}
         />
 
@@ -97,7 +98,7 @@ export function Hero() {
         {/* Floating geometric forms (desktop only) — subtle research motifs */}
         {/* Plus sign */}
         <motion.svg
-          className="absolute top-32 right-[15%] hidden md:block text-accent"
+          className="absolute top-32 left-[45%] hidden lg:block text-accent"
           width="14"
           height="14"
           viewBox="0 0 14 14"
@@ -112,9 +113,9 @@ export function Hero() {
           <path d="M7 0v14M0 7h14" stroke="currentColor" strokeWidth="1" />
         </motion.svg>
 
-        {/* 3×3 dot grid */}
+        {/* 3×3 dot grid — bottom-left of the portrait area */}
         <motion.svg
-          className="absolute bottom-40 left-[8%] hidden md:block text-accent"
+          className="absolute bottom-32 left-[8%] hidden md:block text-accent"
           width="24"
           height="24"
           viewBox="0 0 24 24"
@@ -135,7 +136,7 @@ export function Hero() {
 
         {/* Hairline tick */}
         <motion.div
-          className="absolute bottom-[22%] right-[10%] w-16 h-px bg-foreground/30 hidden md:block"
+          className="absolute bottom-[22%] right-[8%] w-16 h-px bg-foreground/30 hidden md:block"
           initial={reduce ? { opacity: 0.4 } : { opacity: 0 }}
           animate={reduce ? { opacity: 0.4 } : { opacity: [0.9, 0.4, 0.9] }}
           transition={
@@ -168,7 +169,7 @@ export function Hero() {
       {/* ── Hero content ────────────────────────────────────────────── */}
       <div className="container-editorial relative z-10 min-h-[100svh] flex flex-col justify-center pt-32 pb-20">
         <motion.div style={{ y: textY }} className="w-full">
-          {/* Role label */}
+          {/* Role label — above the 2-column composition */}
           <motion.div
             className="font-mono text-eyebrow text-muted-foreground mb-6"
             initial={{ opacity: 0, y: 20 }}
@@ -178,110 +179,60 @@ export function Hero() {
             {profile.role}
           </motion.div>
 
-          {/* Big name with letter stagger */}
-          <div className="flex flex-col leading-none">
-            <HeroLine text={profile.firstName} delay={0.7} />
-            <HeroLine text={profile.lastName} delay={1.0} accent />
-          </div>
+          {/* ── Two-column composition: NAME (left) + PORTRAIT (right) ── */}
+          {/* Desktop: name on the left ~55%, portrait on the right ~45%, both
+              vertically centered. The portrait aligns with the AMZAD/PINSO
+              typography — the eye moves NAME → PHOTO, not NAME → empty space. */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 lg:gap-12 items-center">
+            {/* LEFT — Display name */}
+            <div className="md:col-span-7 lg:col-span-7 order-1">
+              <div className="flex flex-col leading-none">
+                <HeroLine text={profile.firstName} delay={0.7} />
+                <HeroLine text={profile.lastName} delay={1.0} accent />
+              </div>
 
-          {/* Tagline — AI · Research · Teaching */}
-          <motion.p
-            className="font-mono text-eyebrow text-foreground/85 mt-6 tracking-[0.22em]"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.15, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            AI <span className="text-accent">·</span> Research{" "}
-            <span className="text-accent">·</span> Teaching
-          </motion.p>
-
-          {/* Statement + image split layout */}
-          <div className="mt-10 md:mt-16 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start md:items-end">
-            {/* Statement + bio */}
-            <motion.div
-              className="md:col-span-7 lg:col-span-8 max-w-3xl"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <p className="text-base md:text-lg lg:text-xl text-muted-foreground leading-relaxed">
-                {profile.statement}
-              </p>
-              <p className="mt-4 text-xs md:text-sm text-foreground/70 leading-relaxed">
-                {profile.bio}
-              </p>
-            </motion.div>
-
-            {/* Portrait */}
-            <motion.div
-              className="md:col-span-5 lg:col-span-4 mt-8 md:mt-12"
-              initial={
-                reduce
-                  ? { opacity: 0 }
-                  : { opacity: 0, clipPath: "inset(100% 0 0 0)" }
-              }
-              animate={
-                reduce
-                  ? { opacity: 1 }
-                  : { opacity: 1, clipPath: "inset(0% 0 0 0)" }
-              }
-              transition={{ delay: 1.1, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <motion.div
-                className="relative aspect-[4/5] w-full max-w-[280px] md:max-w-none md:ml-auto overflow-hidden"
-                style={{ y: imageY, scale: imageScale }}
+              {/* Tagline — sits directly under the name on the left column */}
+              <motion.p
+                className="font-mono text-eyebrow text-foreground/85 mt-6 tracking-[0.22em]"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.15, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               >
-                <img
-                  src={profile.image}
-                  alt="Portrait of Amzad Pinso, Computer Science & Engineering student at IIUC"
-                  loading="eager"
-                  decoding="async"
-                  fetchPriority="high"
-                  className="w-full h-full object-cover grayscale contrast-[1.05] brightness-95"
-                  style={{
-                    transform: reduce
-                      ? undefined
-                      : "translate(calc(var(--mx,0)*-5px), calc(var(--my,0)*-5px)) scale(1.08)",
-                    transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
-                  }}
-                />
-                {/* Soft accent tint — adds warmth on dark */}
-                <div
-                  className="absolute inset-0 pointer-events-none mix-blend-overlay"
-                  style={{
-                    background: "var(--accent)",
-                    opacity: 0.08,
-                  }}
-                  aria-hidden
-                />
-                {/* Dark vignette — blends portrait into dark bg */}
-                <div
-                  className="absolute inset-0 pointer-events-none mix-blend-multiply"
-                  style={{
-                    background:
-                      "radial-gradient(circle at center, transparent 30%, rgba(13, 15, 18, 0.55) 100%)",
-                  }}
-                  aria-hidden
-                />
-                {/* Thin accent frame */}
-                <div
-                  className="absolute inset-2 pointer-events-none border"
-                  style={{
-                    borderColor:
-                      "color-mix(in oklab, var(--accent) 50%, transparent)",
-                  }}
-                  aria-hidden
-                />
-                {/* Image metadata — using foreground on dark scrim chips for contrast */}
-                <div className="absolute top-3 left-3 font-mono text-[10px] tracking-widest uppercase z-10 px-2 py-1 bg-background/50 backdrop-blur-sm text-foreground/80">
-                  {profile.universityShort} · {profile.semester}
-                </div>
-                <div className="absolute bottom-3 right-3 font-mono text-[10px] tracking-widest uppercase z-10 px-2 py-1 bg-background/50 backdrop-blur-sm text-foreground/80">
-                  CGPA {profile.cgpa}
-                </div>
-              </motion.div>
+                AI <span className="text-accent">·</span> Research{" "}
+                <span className="text-accent">·</span> Teaching
+              </motion.p>
+            </div>
+
+            {/* RIGHT — Editorial portrait */}
+            <motion.div
+              className="md:col-span-5 lg:col-span-5 order-2 flex justify-center md:justify-end"
+              initial={reduce ? { opacity: 0 } : { opacity: 0, clipPath: "inset(0 0 100% 0)" }}
+              animate={reduce ? { opacity: 1 } : { opacity: 1, clipPath: "inset(0 0 0% 0)" }}
+              transition={{ delay: 0.95, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <HeroPortrait
+                src={profile.image}
+                portraitY={portraitY}
+                portraitScale={portraitScale}
+                reduce={reduce}
+              />
             </motion.div>
           </div>
+
+          {/* ── Statement + bio + CTAs (full width below the composition) ── */}
+          <motion.div
+            className="mt-10 md:mt-14 max-w-3xl"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground leading-relaxed">
+              {profile.statement}
+            </p>
+            <p className="mt-4 text-xs md:text-sm text-foreground/70 leading-relaxed">
+              {profile.bio}
+            </p>
+          </motion.div>
 
           {/* CTAs — academic/informational, no commercial CTAs */}
           <motion.div
@@ -343,6 +294,92 @@ export function Hero() {
         </div>
       </motion.div>
     </section>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * HeroPortrait — editorial portrait treatment for the hero.
+ *
+ * Designed to feel like a large editorial portrait integrated
+ * into the composition — NOT a profile card, avatar, or floating
+ * widget. Sits beside the AMZAD/PINSO typography as a visual
+ * counterweight.
+ *
+ * Treatment:
+ * - Tall aspect ratio (4/5) for editorial portrait feel
+ * - Grayscale + slight brightness reduction for cinematic mood
+ * - Soft accent tint overlay for warmth
+ * - Dark vignette to blend into the dark background
+ * - Thin accent frame inset 8px (gallery wall-label)
+ * - Scrim-chip metadata (IIUC, CGPA) for contrast on dark
+ * - Subtle scroll parallax (slower than text for depth)
+ * - Subtle mouse parallax (~5px) on desktop only
+ * - Clip-path reveal entrance from bottom-up
+ * ────────────────────────────────────────────────────────────── */
+function HeroPortrait({
+  src,
+  portraitY,
+  portraitScale,
+  reduce,
+}: {
+  src: string;
+  portraitY: any;
+  portraitScale: any;
+  reduce: boolean | null;
+}) {
+  return (
+    <motion.div
+      className="relative aspect-[4/5] w-full max-w-[280px] sm:max-w-[340px] md:max-w-[26vw] lg:max-w-[30vw] xl:max-w-[32vw] overflow-hidden"
+      style={{ y: portraitY, scale: portraitScale }}
+    >
+      <img
+        src={src}
+        alt="Portrait of Amzad Pinso, Computer Science & Engineering student at IIUC"
+        loading="eager"
+        decoding="async"
+        fetchPriority="high"
+        className="w-full h-full object-cover grayscale contrast-[1.05] brightness-95"
+        style={{
+          transform: reduce
+            ? undefined
+            : "translate(calc(var(--mx,0)*-5px), calc(var(--my,0)*-5px)) scale(1.08)",
+          transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+        }}
+      />
+      {/* Soft accent tint — adds warmth on dark */}
+      <div
+        className="absolute inset-0 pointer-events-none mix-blend-overlay"
+        style={{
+          background: "var(--accent)",
+          opacity: 0.08,
+        }}
+        aria-hidden
+      />
+      {/* Dark vignette — blends portrait into dark bg, soft edges */}
+      <div
+        className="absolute inset-0 pointer-events-none mix-blend-multiply"
+        style={{
+          background:
+            "radial-gradient(circle at center, transparent 30%, rgba(13, 15, 18, 0.55) 100%)",
+        }}
+        aria-hidden
+      />
+      {/* Thin accent frame — gallery wall-label treatment */}
+      <div
+        className="absolute inset-2 pointer-events-none border"
+        style={{
+          borderColor: "color-mix(in oklab, var(--accent) 50%, transparent)",
+        }}
+        aria-hidden
+      />
+      {/* Image metadata — scrim chips for contrast on dark */}
+      <div className="absolute top-3 left-3 font-mono text-[10px] tracking-widest uppercase z-10 px-2 py-1 bg-background/50 backdrop-blur-sm text-foreground/80">
+        {profile.universityShort} · {profile.semester}
+      </div>
+      <div className="absolute bottom-3 right-3 font-mono text-[10px] tracking-widest uppercase z-10 px-2 py-1 bg-background/50 backdrop-blur-sm text-foreground/80">
+        CGPA {profile.cgpa}
+      </div>
+    </motion.div>
   );
 }
 

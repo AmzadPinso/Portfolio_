@@ -939,3 +939,152 @@ It no longer presents him as a service provider or freelancer:
 ### Git Commit
 
 `refactor: redesign portfolio visual identity and positioning` — applied after all fixes verified.
+
+---
+
+## Hero Modification — Profile Portrait Integrated into Composition
+
+### Why
+The previous hero had AMZAD / PINSO on the left and a large empty area on the right. The portrait was pushed to the bottom of the hero (after the statement + bio), visually disconnected from the name. The eye moved NAME → huge empty space, which felt unintentional and unbalanced.
+
+### New Direction
+Two-column editorial composition where the portrait sits to the right of the AMZAD / PINSO typography, vertically centered with it. The portrait acts as a visual counterweight to the name, so the eye now moves NAME → PHOTO naturally.
+
+### Composition Changes
+
+#### Desktop (≥768px)
+- New 2-column grid: name on the left (`md:col-span-7`, ~55%), portrait on the right (`md:col-span-5`, ~45%), both vertically centered via `items-center`
+- Portrait width is `~32vw` at desktop (matches the spec range of 30–35vw): `md:max-w-[26vw] lg:max-w-[30vw] xl:max-w-[32vw]`
+- Portrait vertically aligned with the name: measured portrait center-y = 424.49, name+tagline center-y = 424.24 (Δ < 1px)
+- Tagline `AI · Research · Teaching` sits below the name on the left column (where it belongs — directly under the AMZAD/PINSO typography)
+- Statement + bio + CTAs now flow as a single full-width row BELOW the 2-column composition
+
+#### Tablet (768px)
+- Portrait shrinks to `~28vw` via `md:max-w-[26vw]` breakpoint
+- Name on the left, portrait on the right — side-by-side maintained
+
+#### Mobile (<768px)
+- Layout stacks (via `grid-cols-1`):
+  1. AMZAD
+  2. PINSO
+  3. Tagline (AI · Research · Teaching)
+  4. Portrait (centered, `max-w-[280px]`)
+  5. Statement
+  6. Bio
+  7. CTAs (EXPLORE RESEARCH →, VIEW PROJECTS →, DOWNLOAD CV ↓, LINKEDIN ↗)
+  8. Scroll indicator
+- Portrait is NOT side-by-side with the name on mobile (per spec)
+
+### Portrait Treatment
+The portrait is designed as a **large editorial portrait integrated into the hero composition** — NOT a profile card, avatar, circular headshot, or floating widget.
+
+- **Aspect ratio**: `aspect-[4/5]` (portrait orientation)
+- **Filter**: `grayscale contrast-[1.05] brightness-95` (cinematic mood, blends with the dark academic palette)
+- **Soft accent tint overlay**: `mix-blend-overlay` with `var(--accent)` at 0.08 opacity — adds warmth on dark
+- **Dark vignette**: `mix-blend-multiply` with `radial-gradient(circle at center, transparent 30%, rgba(13,15,18,0.55) 100%)` — blends the portrait into the dark background, soft edges
+- **Thin accent frame**: `inset-2` with `border-color: color-mix(in oklab, var(--accent) 50%, transparent)` — gallery wall-label treatment (not a product glow)
+- **Scrim-chip metadata**: `bg-background/50 backdrop-blur-sm text-foreground/80` for `IIUC · 7th Semester` (top-left) and `CGPA 3.66 / 4.00` (bottom-right) — readable on dark
+- **No rounded corners**: rectangular, sharp silhouette (academic feel)
+
+### Animation Sequence
+The hero entrance now has a deliberate sequence:
+
+1. **Hero loads** (preloader fades out at ~1.4s)
+2. **Role label fades in** at `delay: 0.6s` (Computer Science & Engineering Student)
+3. **Name reveals with letter stagger** at `delay: 0.7s` (AMZAD) and `delay: 1.0s` (PINSO) — each letter staggered 0.04s, `y: 100% → 0%` over 0.85s
+4. **Portrait reveals from clip-path** at `delay: 0.95s` — `clipPath: "inset(0 0 100% 0)"` → `clipPath: "inset(0 0 0% 0)"` over 1.2s (bottom-up wipe, matching the letter stagger direction)
+5. **Portrait settles** — subtle opacity + clip-path reveal, no aggressive zoom (per spec)
+6. **Tagline fades in** at `delay: 1.15s`
+7. **Statement + bio fade in** at `delay: 1.3s`
+8. **CTAs fade in** at `delay: 1.6s`
+9. **Scroll indicator fades in** at `delay: 2.0s`
+
+The portrait's reveal is synced to start slightly before the tagline (0.95s vs 1.15s), so the photo lands beside the name as the name is finishing its letter stagger — the eye perceives them as one composed moment.
+
+### Scroll Behavior
+- Portrait moves slightly slower than the text (`portraitY: 0% → 12%` vs `textY: 0% → -10%`) — creates subtle depth, the portrait feels "anchored" while the text scrolls past
+- Portrait has a very subtle scale on scroll (`portraitScale: 1 → 1.04`) — gentle zoom-in, not aggressive
+- Hero opacity fades from 1 → 0.3 over the full scroll range (no more full vanishing — keeps a ghost presence)
+- Portrait never disappears too quickly (opacity floor at 0.3) and never overlaps important content (the 12% drift is well within the portrait container)
+
+### Desktop Mouse Parallax
+- Portrait has a subtle mouse parallax (~5px) via CSS variables (`--mx`, `--my`) — kept subtle per audit recommendations
+- Disabled on touch devices (via `matchMedia("(pointer: coarse)")`)
+- Disabled on reduced-motion (via `useReducedMotion`)
+
+### Background Composition Update
+- The giant thin outlined circle was moved to sit behind the portrait area (`-top-1/4 right-[-15%] w-[140vw] h-[140vw] hidden md:block`) instead of bleeding off the top center — it now frames the portrait on the right
+- The plus sign moved to `left-[45%] hidden lg:block` (between the name and portrait) — visually bridges the two columns
+- The accent radial highlight moved to `circle at 80% 25%` (warms the portrait area on the right)
+- All other decorative shapes (dot grid, hairline tick, faint grid) kept in place
+
+### Files Modified
+
+- `src/components/hero/Hero.tsx` — full restructure:
+  - New 2-column grid for the name + portrait (with `items-center` for vertical alignment)
+  - Tagline moved inside the left column (under the name)
+  - Portrait moved to the right column (extracted as a new `HeroPortrait` component for clarity)
+  - Statement + bio + CTAs moved to a full-width row below the composition
+  - Renamed `imageY` / `imageScale` to `portraitY` / `portraitScale` for clarity
+  - Updated background shape positions (giant circle moved to behind portrait area)
+  - Updated portrait width responsive classes: `max-w-[280px] sm:max-w-[340px] md:max-w-[26vw] lg:max-w-[30vw] xl:max-w-[32vw]`
+
+### What Was Preserved
+
+- All existing animations (letter stagger, magnetic CTAs, custom cursor, scroll progress)
+- All existing typography (Newsreader display + IBM Plex Mono eyebrow + Inter body)
+- All existing navigation (AMZAD PINSO logo + numbered section links + CV button)
+- All existing floating metadata labels (Chattogram, Bangladesh + Undergraduate Teaching Assistant)
+- All existing CTAs (EXPLORE RESEARCH, VIEW PROJECTS, DOWNLOAD CV, LINKEDIN)
+- All existing background decorative shapes (giant circle, dot grid, plus sign, hairline tick, accent radial, faint grid)
+- All existing accessibility features (aria-labels, focus-visible outlines, reduced-motion, 44px touch targets)
+- All existing dark academic color palette and typography tokens
+- Hero height unchanged (still `min-h-[100svh]` with `pt-32 pb-20`)
+
+### Testing
+
+#### Lint
+- `bun run lint` returns 0 errors, 0 warnings
+
+#### Build
+- Dev server compiles cleanly: `Next.js 16.1.3 (Turbopack)` → `Ready in ~600ms`
+- No hydration mismatches, no runtime errors in `dev.log`
+
+#### Static Asset
+- `GET /images/me/me.jpg` → 200, 32813 bytes (~32KB), `image/jpeg`
+- Image natural dimensions 800×1000 (4:5 portrait) — matches the `aspect-[4/5]` container
+
+#### Agent Browser Verification (3 viewports)
+
+**Desktop 1280×800**
+- Portrait bounding rect: x=790, y=148, width=442, height=553 (rendered w/ scale; visible wrapper 410×512)
+- Name bounding rect: x=64, y=275, width=652, height=129 (AMZAD) / y=404 (PINSO)
+- Portrait center-y: 424.49; name+tagline center-y: 424.24 (Δ < 1px) — vertically aligned
+- Portrait right edge x=1216 — 64px from viewport right (matches container padding)
+- Portrait width 32.0vw (matches spec range 30–35vw)
+- All 10 section IDs present
+- Zero console errors
+
+**Tablet 768×1024**
+- Portrait width 215.65px / 28.1vw (smaller than desktop, per `md:max-w-[26vw]`)
+- Name on left (x=38, right edge 425), portrait on right (x=522, right edge 738) — gap ~97px
+- Both vertically aligned
+
+**Mobile 390×844**
+- Stack order verified: AMZAD → PINSO → tagline → portrait → statement → bio → CTAs → scroll indicator
+- Portrait centered (x=43.8, width=302.4, margins 43.8px both sides)
+- Portrait NOT side-by-side with name (portrait y=315 vs name bottom y=257)
+
+#### No regressions
+- All 4 CTAs (EXPLORE RESEARCH, VIEW PROJECTS, DOWNLOAD CV, LINKEDIN) visible with correct hrefs
+- Floating labels visible (Chattogram, Bangladesh on top-right; Undergraduate Teaching Assistant on top-left)
+- Navigation bar fully functional (9 links visible on desktop)
+- AI · Research · Teaching tagline visible at all 3 viewports
+- Scroll indicator visible at bottom at all 3 viewports
+- All background decorative shapes visible (giant circle, dot grid, plus sign, hairline tick, accent radial, vignette)
+- Photo doesn't overlap navigation (portrait top y=148, nav bottom y=80 — 68px gap)
+- Hero doesn't have unnecessary extra height (1045px = 1.31× viewport, accounted for by content)
+
+### Git Commit
+
+`feat: integrate profile portrait into hero composition`
